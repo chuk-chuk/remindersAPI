@@ -2,14 +2,12 @@
 // =============================================================================
 
 // call the packages we need
-var express    = require('express');        // call express
+var express    = require('express');
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
-var reminders = require('./models/reminders');
-
-mongoose.connect('mongodb://localhost:27017'); //connect to DB
-
+var Reminder = require('./models/reminders');
+var mongojs = require('mongojs');
+var db = mongojs('mongodb://localhost:27017/Reminders'); //connect to DB
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -32,36 +30,25 @@ router.get('/', function(req, res) {
     res.json({ message: 'hooray! welcome to our api!' });
 });
 
-// more routes for our API will happen here
-router.route('/reminders')
+router.get('/reminders', function (req, res, next) {
 
-// create a reminder (accessed at POST http://localhost:8080/api/reminders)
-    .post(function(req, res) {
-
-        var reminder = new Reminder();      // create a new instance of the Reminder model
-        reminder.created_at = req.body.created_at;
-        reminder.text = req.body.text;  // set the reminder dates (comes from the request)
-        reminder.expired_by = req.body.expired_by;
-
-        // save the reminder and check for errors
-        reminder.save(function(err) {
-            if (err)
-                res.send(err);
-
-            res.json({ message: 'Reminder created!' });
-        });
-
+   var collection = db.collection('reminders-collection');
+    collection.find().toArray(function (err, reminders) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.json(reminders);
+        }
     });
+});
 
-// get all the reminders (accessed at GET http://localhost:8080/api/reminders)
-      .get(function(req, res) {
-          Reminder.find(function(err, reminders) {
-              if (err)
-                  res.send(err);
+router.post('/reminder-new', function(req, res) {
+  db.collection('reminders-collection').save(req.body, (err, result) => {
+   if (err) return console.log(err)
 
-              res.json(reminders);
-          });
-      });
+   console.log('saved to database')
+ })
+});
 
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
