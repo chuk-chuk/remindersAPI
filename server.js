@@ -28,7 +28,7 @@ router.use(function(req, res, next) {
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
     res.json({ message: 'hooray! welcome to our api!' });
-    res.send('Hello Yulia!')
+    // res.send('Hello Yulia!')
 });
 
 router.get('/reminders', function (req, res, next) {
@@ -43,14 +43,26 @@ router.get('/reminders', function (req, res, next) {
     });
 });
 
-router.post('/reminder-new', function(req, res) {
-  db.collection('reminders-collection').save(req.body, (err, result) => {
-   if (err) return console.log(err)
-
-   console.log('saved to database')
+//search by ID
+router.get('/reminderById/:date', function(req, res) {
+  var createdDate = req.params.date;
+  var reminderCollection = db.collection('reminders-collection');
+  reminderCollection.find({"created_at":createdDate}).toArray(function (err, result) {
+    if (err) {
+        res.send(err);
+    } else {
+        res.json(result);
+    };
  })
 });
 
+router.post('/reminder-new', function(req, res) {
+  db.collection('reminders-collection').save(req.body, (err, result) => {
+    if (err) return console.log(err)
+
+    console.log('saved to database')
+  })
+});
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
 app.use('/api', router);
