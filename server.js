@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-var Reminder = require('./models/reminders');
+// var Reminder = require('./models/reminders');
 var mongojs = require('mongojs');
 var db = mongojs('mongodb://localhost:27017/Reminders'); //connect to DB
 // configure app to use bodyParser()
@@ -10,7 +10,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 var port = process.env.PORT || 8080;
-var router = express.Router();              // get an instance of the express Router
+var router = express.Router();
+
+router.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 router.use(function(req, res, next) {
   console.log('something is happening');
@@ -52,15 +58,16 @@ router.get('/reminderByContext/:content', function(req, res){
     if (err) {
         res.send(err);
     } else {
-        res.json(result);
+        res.json({result});
     };
   });
 });
 
 router.post('/reminder-new', function(req, res) {
   db.collection('reminders-collection').save(req.body, (err, result) => {
-    if (err) return console.log(err)
-    console.log('saved to database')
+    if (err) {return console.log(err)} else {
+        res.json({'status' : '200'});
+    };
   })
 });
 // REGISTER OUR ROUTES -------------------------------
