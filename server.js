@@ -6,6 +6,7 @@ const cors = require('cors');
 var mongojs = require('mongojs');
 var db = mongojs('mongodb://localhost:27017/Reminders'); //connect to DB
 var ObjectID = require('mongodb').ObjectID;
+var collection = db.collection('reminders-collection');
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -32,7 +33,6 @@ router.get('/', function(req, res) {
 });
 
 router.get('/reminders', function (req, res, next) {
-   var collection = db.collection('reminders-collection');
     collection.find().toArray(function (err, reminders) {
         if (err) {
             res.send(err);
@@ -44,8 +44,7 @@ router.get('/reminders', function (req, res, next) {
 //search by creation date
 router.get('/reminderByCreateDate/:date', function(req, res) {
   var createdDate = req.params.date;
-  var reminderCollection = db.collection('reminders-collection');
-  reminderCollection.find({"created_at": createdDate}).toArray(function(err, result) {
+  collection.find({"created_at": createdDate}).toArray(function(err, result) {
     if (err) {
         res.send(err);
     } else {
@@ -56,8 +55,7 @@ router.get('/reminderByCreateDate/:date', function(req, res) {
 //search by content
 router.get('/reminderByContext/:content', function(req, res){
   var content = req.params.content;
-  var reminderCollection = db.collection('reminders-collection');
-  reminderCollection.find({"text": content}).toArray(function(err, result){
+  collection.find({"text": content}).toArray(function(err, result){
     if (err) {
         res.send(err);
     } else {
@@ -67,7 +65,7 @@ router.get('/reminderByContext/:content', function(req, res){
 });
 
 router.post('/reminder-new', function(req, res) {
-  db.collection('reminders-collection').save(req.body, (err, result) => {
+  collection.save(req.body, (err, result) => {
     if (err) {return console.log(err)} else {
         res.json({'status' : '200'});
     };
@@ -77,9 +75,8 @@ router.post('/reminder-new', function(req, res) {
 //edit reminder
 router.put('/reminders/:reminderId', function(req, res) {
   var reminderId = req.params._id;
-  console.log(req.body)
-  db.collection('reminders-collection').update(
-    {_id :  ObjectID(req.body._id) },
+  collection.update(
+    {_id:  ObjectID(req.body._id)},
     { $set: { 'text': req.body.text, 'expired_by': req.body.expired_by}
   }, function(err){
     if(err) {res.send(err)} else {
@@ -89,12 +86,14 @@ router.put('/reminders/:reminderId', function(req, res) {
 });
 
 //delete reminder to check
-router.delete('/reminders/:reminderId', function(req, res) {
+router.post('/reminders/:reminderId', function(req, res) {
   var reminderId = req.params._id;
-  db.collection('reminders-collection').remove(reminderId, (err, result) => {
-    if (err) {return console.log(err)} else {
-      console.log("hello");
-        res.json({message: 'reminder deleted'});
+  console.log(req.body);
+  console.log(req.params._id);
+  collection.remove(
+    {_id: ObjectID(req.body._id)}, function(err) {
+    if(err) {res.send(err)} else {
+      res.json({message: 'reminder deleted'});
     };
   });
 });
