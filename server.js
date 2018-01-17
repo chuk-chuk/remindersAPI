@@ -74,7 +74,6 @@ router.post('/reminder-new', function(req, res) {
 
 //edit reminder
 router.put('/reminders/:reminderId', function(req, res) {
-  var reminderId = req.params._id;
   collection.update(
     {_id:  ObjectID(req.body._id)},
     { $set: { 'text': req.body.text, 'expired_by': req.body.expired_by}
@@ -87,11 +86,9 @@ router.put('/reminders/:reminderId', function(req, res) {
 
 //delete reminder to check
 router.post('/reminders/:reminderId', function(req, res) {
-  var reminderId = req.params._id;
-  console.log(req.body);
-  console.log(req.params._id);
+  var reminderId = req.params.reminderId;
   collection.remove(
-    {_id: ObjectID(req.body._id)}, function(err) {
+    {_id: ObjectID(reminderId)}, function(err) {
     if(err) {res.send(err)} else {
       res.json({message: 'reminder deleted'});
     };
