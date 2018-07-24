@@ -14,6 +14,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 var port = process.env.PORT || 8080;
+//get a different post to for tests
 var router = express.Router();
 
 router.use(function (req, res, next) {
@@ -23,7 +24,7 @@ router.use(function (req, res, next) {
 });
 
 router.use(function(req, res, next) {
-  console.log('something is happening');
+  console.log('something is happening'); //do I need this? runs during the tests too
   next();
 });
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
@@ -95,9 +96,10 @@ router.post('/reminders/:reminderId', function(req, res) {
   });
 });
 
-// REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
 app.use('/api', router);
 // START THE SERVER
-app.listen(port);
+if(!module.parent){ app.listen(port); }
 console.log('Magic happens on port ' + port);
+
+module.exports = app;
