@@ -69,8 +69,70 @@ describe('/api/reminders', () => {
         chai.request(server)
             .get('/api/reminders')
             .end((err, res) => {
-            expect(res.body).to.be.an('array');
+                expect(res.body).to.be.an('array');
             done();
         });
     });
-})
+});
+
+describe('/api/reminder-new', () => {
+    before(() => {
+        mongoose.createConnection('mongodb://localhost:27017/Reminders');
+        //how to automatically spin up a mongo shell instance during the tests run
+    });
+
+    after(() => {
+        mongoose.connection.close();
+    });
+
+    it('should post a new reminder to the DB', done => {
+        let reminder = {
+            "text": "testing only",
+            "expired_by": "2018-01-24",
+            "created_at": "2018-01-22"
+        }
+        
+        chai.request(server)
+        .post('/api/reminder-new')
+        .send(reminder)
+        .end((err, res) => {
+            expect(res.statusCode).to.equal(200);
+            expect(reminder).to.be.a('object');
+            expect(reminder).to.have.a.property('text');
+            expect(reminder).to.have.a.property('expired_by');
+            expect(reminder).to.have.a.property('created_at');
+            expect(reminder.text).to.equal('testing only');
+        done();
+        })
+    });
+});
+
+describe.only('/api/reminderByCreateDate/:date', () => {
+    before(() => {
+        mongoose.createConnection('mongodb://localhost:27017/Reminders');
+        //how to automatically spin up a mongo shell instance during the tests run
+    });
+
+    after(() => {
+        mongoose.connection.close();
+    });
+
+    it('should get reminders by the given date', done => {
+        let reminder = {
+            "text": "testing and only testing",
+            "expired_by": "2018-01-20",
+            "created_at": "2017-01-22"
+        }
+
+        reminder.save((err, reminder) => {
+            chai.request(server)
+            .get('/api/reminderByCreateDate/' + reminder.created_at)
+            .send(reminder)
+            .end((err, res) => {
+                expect(res.statusCode).to.equal(200);
+            done();
+            });
+        });
+    });
+});
+        
