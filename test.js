@@ -3,50 +3,87 @@ const expect = require('chai').expect;
 const chaiHttp = require('chai-http');
 const server = require('./server');
 const chai = require('chai');
-const mongoose = require("mongoose");
+// var mongojs = require('mongojs');
+// var db = mongojs('mongodb://localhost:27017/Reminders'); //connect to DB
+//var collection = db.collection('reminders-collection');
 
 chai.use(chaiHttp);
 
-describe('/api', () => {
+describe('Health point /api', () => {
     it('should return 200', done => {
         chai.request(server)
             .get('/api')
             .end((err, res) => {
             expect(res.statusCode).to.equal(200);
-            expect(res.body.message).to.be.a('string');
             done();
         });
     });
-
+    
     it('should return 404', done => {
         chai.request(server)
-            .get('/aaappii')
-            .end((err, res) => {
+        .get('/aaappii')
+        .end((err, res) => {
             expect(res.statusCode).to.equal(404);
             done();
         });
     });
-
+    
     it('should get the welcome message', done => {
         chai.request(server)
         .get('/api')
         .end((err, res) => {
+            expect(res.body.message).to.be.a('string');
             expect(res.body.message).to.equal('hooray! welcome to our api!');
             done();
         });
     });
-})
+});
 
-describe('/api/reminders', () => {
-    before(() => {
-        mongoose.createConnection('mongodb://localhost:27017/Reminders');
-        //how to automatically spin up a mongo shell instance during the tests run
+describe('POST', () => {
+    
+    it('should post a new reminder to the DB', done => {
+        let reminder = {//const vs let in this scope
+            "text": "testing only",
+            "expired_by": "2018-01-24",
+            "created_at": "2018-01-22"
+        }
+        
+        chai.request(server)
+        .post('/api/reminder-new')
+        .send(reminder)
+        .end((err, res) => {
+            console.log(res.body[0])
+            //TO DO res.body !!!
+            expect(res.statusCode).to.equal(200);
+            expect(res.body[0]).to.be.a('object');
+            expect(res.body[0]).to.have.a.property('text');
+            expect(res.body[0]).to.have.a.property('expired_by');
+            expect(res.body[0]).to.have.a.property('created_at');
+            expect(res.body[0].text).to.equal('testing only');
+        done();
+        })
     });
+});
 
-    after(() => {
-        mongoose.connection.close();
+describe('GET all /api/reminders', () => {
+    it('should get all the reminders', done => {
+        chai.request(server)
+        .get('/api/reminders')
+        .end((err, res) => {
+        expect(res.statusCode).to.equal(200);
+        expect(res.body.length).to.equal(1);
+        done();
+        }); 
     });
+});
 
+describe('UPDATE', ()=> {
+    it('should update the current reminder', done => {
+        console.log('update');
+    })
+});
+
+describe('GET all /api/reminders', () => {
     it('should return 200', done => {
         chai.request(server)
             .get('/api/reminders')
@@ -70,69 +107,74 @@ describe('/api/reminders', () => {
             .get('/api/reminders')
             .end((err, res) => {
                 expect(res.body).to.be.an('array');
+                expect(res.body.length).to.equal(1);
             done();
         });
     });
 });
 
-describe('/api/reminder-new', () => {
-    before(() => {
-        mongoose.createConnection('mongodb://localhost:27017/Reminders');
-        //how to automatically spin up a mongo shell instance during the tests run
-    });
+describe('GET by create date', () => {
+    // before(() => {
+    //     db.on('connect', () => {
+    //         console.log('database connected')
+    //     });
+    //     //how to automatically spin up a mongo shell instance during the tests run //docker container nice to have you need mongo running on the standart port
+    //     //clean db after every test run
+    // });
 
-    after(() => {
-        mongoose.connection.close();
-    });
+    // after(() => {
+    //     collection.remove({}, ()=> {
+    //         db.close('disconnected', () => {
+    //             console.log('database disconnected')
+    //         });
+    //     });
+    // });
 
-    it('should post a new reminder to the DB', done => {
-        let reminder = {
-            "text": "testing only",
-            "expired_by": "2018-01-24",
-            "created_at": "2018-01-22"
-        }
+    it('should get reminders by the given date - /api/reminderByCreateDate/:date', done => {
         
-        chai.request(server)
-        .post('/api/reminder-new')
-        .send(reminder)
-        .end((err, res) => {
-            expect(res.statusCode).to.equal(200);
-            expect(reminder).to.be.a('object');
-            expect(reminder).to.have.a.property('text');
-            expect(reminder).to.have.a.property('expired_by');
-            expect(reminder).to.have.a.property('created_at');
-            expect(reminder.text).to.equal('testing only');
-        done();
-        })
-    });
-});
-
-describe.only('/api/reminderByCreateDate/:date', () => {
-    before(() => {
-        mongoose.createConnection('mongodb://localhost:27017/Reminders');
-        //how to automatically spin up a mongo shell instance during the tests run
-    });
-
-    after(() => {
-        mongoose.connection.close();
-    });
-
-    it('should get reminders by the given date', done => {
         let reminder = {
             "text": "testing and only testing",
             "expired_by": "2018-01-20",
             "created_at": "2017-01-22"
         }
 
-        reminder.save((err, reminder) => {
+        //const cb = (err) => {
             chai.request(server)
             .get('/api/reminderByCreateDate/' + reminder.created_at)
             .send(reminder)
             .end((err, res) => {
                 expect(res.statusCode).to.equal(200);
+                expect(res.body).to.be.an("array");
+                expect(res.body[0].created_at).to.equal("2017-01-22");
             done();
             });
-        });
+        //};
+
+       // collection.save(reminder, cb);
     });
 });
+
+describe('GET by content', ()=> {
+    it('should get reminders by its content', done => {
+        console.log('get by content')
+    });
+});
+
+describe('DELETE', () => {
+    it('should delete the reminder', done => {
+        console.log("delete");
+    });
+});
+
+describe('GET no reminders', () => {
+    it('should get all the reminders including the updated one', done => {
+        chai.request(server)
+        .get('/api/reminders')
+        .end((err, res) => {
+        expect(res.statusCode).to.equal(404);
+        done();
+        }); 
+    });
+});
+
         
