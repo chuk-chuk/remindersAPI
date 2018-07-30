@@ -24,13 +24,16 @@ router.use(function (req, res, next) {
 });
 
 router.use(function(req, res, next) {
-  console.log('something is happening'); //do I need this? runs during the tests too
+  console.log('debugger logs below:');
+  console.log('Params: ', req.params)
+  console.log('Path: ', req.path)
+  console.log('Query: ', req.query) 
+  console.log('Method: ', req.method) 
   next();
 });
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
     res.json({ message: 'hooray! welcome to our api!' });
-    // res.send('Hello Yulia!')
 });
 
 router.get('/reminders', function (req, res, next) {
@@ -42,7 +45,7 @@ router.get('/reminders', function (req, res, next) {
         }
     });
 });
-//search by creation date
+
 router.get('/reminderByCreateDate/:date', function(req, res) {
   var createdDate = req.params.date;
   collection.find({"created_at": createdDate}).toArray(function(err, result) {
@@ -51,12 +54,11 @@ router.get('/reminderByCreateDate/:date', function(req, res) {
     } else {
         res.json(result);
     };
- });
+  });
 });
-//search by content
-router.get('/reminderByContext/:content', function(req, res){
-  var content = req.params.content;
-  collection.find({"text": content}).toArray(function(err, result){
+//TO DO search by content //change
+router.get('/reminders', function(req, res){
+  collection.find({"text": req.query.content}).toArray(function(err, result){
     if (err) {
         res.send(err);
     } else {
@@ -65,7 +67,7 @@ router.get('/reminderByContext/:content', function(req, res){
   });
 });
 
-router.post('/reminder-new', function(req, res) {
+router.post('/reminders', function(req, res) {
   collection.save(req.body, (err, result) => {
     if (err) {return console.log(err)} else {
         res.json({'status' : '200'});
@@ -73,32 +75,30 @@ router.post('/reminder-new', function(req, res) {
   })
 });
 
-//edit reminder
 router.put('/reminders/:reminderId', function(req, res) {
-  collection.update(
-    {_id:  ObjectID(req.body._id)},
-    { $set: { 'text': req.body.text, 'expired_by': req.body.expired_by}
-  }, function(err){
+  collection.findAndModify({
+    query: {_id: ObjectID(req.body._id)},
+    update: {$set: {'text': req.body.text, 'expired_by': req.body.expired_by}},
+    returnNewDocument: true,
+  },
+  function(err){
     if(err) {res.send(err)} else {
-      res.json({message: 'reminder edited!'});
+      res.json({message: 'reminder edited!'}); //return req.body//full updated object
     };
-  })
-});
+  });
+})
 
-//delete reminder to check
-router.post('/reminders/:reminderId', function(req, res) {
-  var reminderId = req.params.reminderId;
+router.delete('/reminders/:reminderId', function(req, res) {
   collection.remove(
-    {_id: ObjectID(reminderId)}, function(err) {
+    {_id: ObjectID(req.params.reminderId)}, function(err) {
     if(err) {res.send(err)} else {
       res.json({message: 'reminder deleted'});
     };
   });
 });
 
-// all of our routes will be prefixed with /api
 app.use('/api', router);
-// START THE SERVER
+
 if(!module.parent){ app.listen(port); }
 console.log('Magic happens on port ' + port);
 
