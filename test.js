@@ -40,48 +40,84 @@ describe('Health point /api', () => {
 });
 
 describe('POST', () => {
-    
-    it('should post a new reminder to the DB', done => {
-        let reminder = {//const vs let in this scope
+    it('should post a new reminder', done => {
+        let reminder = {
             "text": "testing only",
             "expired_by": "2018-01-24",
             "created_at": "2018-01-22"
-        }
+        };
         
         chai.request(server)
         .post('/api/reminder-new')
         .send(reminder)
-        .end((err, res) => {
-            console.log(res.body[0])
-            //TO DO res.body !!!
+        .end(function(err,res){
+            if(err)
+            return done(err);
+            else
+            console.log('Reminder posted');
             expect(res.statusCode).to.equal(200);
-            expect(res.body[0]).to.be.a('object');
-            expect(res.body[0]).to.have.a.property('text');
-            expect(res.body[0]).to.have.a.property('expired_by');
-            expect(res.body[0]).to.have.a.property('created_at');
-            expect(res.body[0].text).to.equal('testing only');
-        done();
+            done();
         })
     });
 });
 
 describe('GET all /api/reminders', () => {
-    it('should get all the reminders', done => {
+
+    it('should get 200 when requesting all reminders', done => {
         chai.request(server)
         .get('/api/reminders')
-        .end((err, res) => {
-        expect(res.statusCode).to.equal(200);
-        expect(res.body.length).to.equal(1);
-        done();
+        .end(function(err, res){
+            if (err)
+            return done(err);
+            else {
+                expect(res.statusCode).to.equal(200);
+                expect(res.body).to.be.an('array');
+                done();
+            }
+        }); 
+    });
+
+    it('should return an array of objects containing some properties', done => {
+        chai.request(server)
+        .get('/api/reminders')
+        .end(function(err, res){
+            if (err)
+            return done(err);
+            else {
+                expect(res.body.length).to.equal(19);
+                expect(res.body[0]).to.have.a.property('text');
+                expect(res.body[0]).to.have.a.property('expired_by');
+                expect(res.body[0]).to.have.a.property('created_at');
+                expect(res.body[0].text).to.equal('testing only');
+                done();
+            }
         }); 
     });
 });
 
 describe('UPDATE', ()=> {
     it('should update the current reminder', done => {
-        console.log('update');
+        chai.request(server)
+        .get('/api/reminders')
+        .end(function(err, res){
+            console.log('Update', res.body[0]._id);
+            chai.request(server)
+            .put('api/reminders/' + res.body[0]._id)
+            .send({'text': 'Spider'})
+            .end(function(err, res){
+                if (err)
+                return done(err)
+                else {
+                    console.log('edited');
+                    expect(res.statusCode).to.equal(200);
+                    expect(res.body[0].text).to.equal('Spider');
+                    done();
+                }
+            })
+        })
     })
 });
+
 
 describe('GET all /api/reminders', () => {
     it('should return 200', done => {
@@ -155,14 +191,38 @@ describe('GET by create date', () => {
 });
 
 describe('GET by content', ()=> {
-    it('should get reminders by its content', done => {
-        console.log('get by content')
+    it('should get reminders by query content - /api/reminderByCreateDate/:date', done => {
+        
+        let reminder = {
+            "text": "testing and only testing",
+            "expired_by": "2018-01-20",
+            "created_at": "2017-01-22"
+        }
+            chai.request(server)
+            .get('/api/reminderByContext/' + reminder.text)
+            .send(reminder)
+            .end((err, res) => {
+                expect(res.statusCode).to.equal(200);
+                expect(res.body[0].text).to.equal("testing and only testing");
+            done();
+            });
     });
 });
 
 describe('DELETE', () => {
     it('should delete the reminder', done => {
-        console.log("delete");
+        chai.request(server)
+        .get('/api/reminders')
+        .end(function(err, res){
+            chai.request(server)
+                .delete('/reminders/' + res.body[0]._id)
+                .end(function(error, res){
+                    console.log('reminder deleted');
+                    expect(res.body).to.be.an('array');
+                    expect(res.body).to.equal([]);
+                done();
+            });
+        });
     });
 });
 
@@ -171,7 +231,7 @@ describe('GET no reminders', () => {
         chai.request(server)
         .get('/api/reminders')
         .end((err, res) => {
-        expect(res.statusCode).to.equal(404);
+            expect(res.statusCode).to.equal(404);
         done();
         }); 
     });
