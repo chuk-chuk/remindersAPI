@@ -75,24 +75,36 @@ router.post('/reminders', function(req, res) {
   })
 });
 
-router.put('/reminders/:reminderId', function(req, res) {
+router.put('/reminders/:reminderId', function(req, res, next) {
   collection.findAndModify({
     query: {_id: ObjectID(req.body._id)},
-    update: {$set: {'text': req.body.text, 'expired_by': req.body.expired_by}},
-    returnNewDocument: true,
-  },
-  function(err){
-    if(err) {res.send(err)} else {
-      res.json({message: 'reminder edited!'}); //return req.body//full updated object
-    };
-  });
+    update: { 
+      $set: { 
+        text: req.body.text, 
+        expired_by: req.body.expired_by,
+        created_at: req.body.created_at 
+      } 
+    },
+    upsert: true,
+    new: true,
+  }),
+  function(err, object) {
+    if (err){
+        console.warn(err.message);  // returns error if no matching object found
+    }else{
+        console.log(object);
+    }
+  }
 })
 
 router.delete('/reminders/:reminderId', function(req, res) {
   collection.remove(
     {_id: ObjectID(req.params.reminderId)}, function(err) {
     if(err) {res.send(err)} else {
-      res.json({message: 'reminder deleted'});
+      res.status(404).json({
+        status: "terminated",
+        message: "The information is not accessible anymore"
+      });
     };
   });
 });

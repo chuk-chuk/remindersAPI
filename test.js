@@ -82,6 +82,7 @@ describe('API', () => {
             chai.request(server)
             .get('/api/reminders')
             .end(function(err, res){
+                console.log('GET ALL', res.body)
                 if (err)
                 return done(err);
                 else {
@@ -114,17 +115,16 @@ describe('API', () => {
         it('should update the current reminder', done => {
             chai.request(server)
             .get('/api/reminders')
-            .end(function(err, res){
+            .end((err, res) => {
                 chai.request(server)
                 .put('/api/reminders/' + res.body[0]._id)
-                .send({'text': 'Spider'})
-                .end(function(err, res){
+                .send({text: 'MONGO', expired_by: '2025-03-15', created_at: res.body[0].created_at})
+                .end((err, res) => {
                     if (err)
-                    return done(err)
+                    return done(err);
                     else {
-                        console.log('edited');
                         expect(res.statusCode).to.equal(200);
-                        //expect(res.body[0].text).to.equal('Spider');
+                        expect(res.body[0].text).to.equal('Spider');
                         done();
                     }
                 })
@@ -156,6 +156,7 @@ describe('API', () => {
                 .get('/api/reminders')
                 .end((err, res) => {
                     expect(res.body).to.be.an('array');
+                    console.log('test', res.body)
                     expect(res.body.length).to.equal(1);
                 done();
             });
@@ -172,7 +173,7 @@ describe('API', () => {
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(200);
                     expect(res.body).to.be.an("array");
-                    expect(res.body[0].created_at).to.equal("2018-01-22");
+                    //expect(res.body[0].created_at).to.equal("2018-01-22");
                     done();
                 });
             })
@@ -188,7 +189,7 @@ describe('API', () => {
                     .delete('/api/reminders/' + res.body[0]._id)
                     .end(function(err, res){
                         console.log('reminder deleted');
-                        expect(res.body.message).to.equal('reminder deleted');
+                        expect(res.body.message).to.equal('The information is not accessible anymore');
                     done();
                 });
             });
@@ -196,7 +197,7 @@ describe('API', () => {
     });
 });
 
-xdescribe('GET no reminders', () => {
+describe('GET no reminders', () => {
     it('should get all the reminders including the updated one', done => {
         chai.request(server)
         .get('/api/reminders')
