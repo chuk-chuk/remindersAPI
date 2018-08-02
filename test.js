@@ -82,9 +82,8 @@ describe('API', () => {
             chai.request(server)
             .get('/api/reminders')
             .end(function(err, res){
-                console.log('GET ALL', res.body)
                 if (err)
-                return done(err);
+                    return done(err);
                 else {
                     expect(res.statusCode).to.equal(200);
                     expect(res.body).to.be.an('array');
@@ -118,13 +117,15 @@ describe('API', () => {
             .end((err, res) => {
                 chai.request(server)
                 .put('/api/reminders/' + res.body[0]._id)
-                .send({text: 'MONGO', expired_by: '2025-03-15', created_at: res.body[0].created_at})
+                //.send({text: 'MONGO', expired_by: '2025-03-15', created_at: res.body[0].created_at})
+                .send({text: 'MONGO'})
                 .end((err, res) => {
+                    // console.log({err, res});
                     if (err)
                     return done(err);
                     else {
                         expect(res.statusCode).to.equal(200);
-                        expect(res.body[0].text).to.equal('Spider');
+                        expect(res.body[0].text).to.equal('MONGO');
                         done();
                     }
                 })
@@ -156,7 +157,6 @@ describe('API', () => {
                 .get('/api/reminders')
                 .end((err, res) => {
                     expect(res.body).to.be.an('array');
-                    console.log('test', res.body)
                     expect(res.body.length).to.equal(1);
                 done();
             });
@@ -195,16 +195,16 @@ describe('API', () => {
             });
         });
     });
-});
 
-describe('GET no reminders', () => {
-    it('should get all the reminders including the updated one', done => {
-        chai.request(server)
-        .get('/api/reminders')
-        .end((err, res) => {
-            expect(res.statusCode).to.equal(404);
-        done();
-        }); 
+    describe('GET no reminders', () => {
+        it('should NOT get any reminders and send 404', done => {
+            chai.request(server)
+            .get('/api/reminders')
+            .end((err, res) => {
+                expect(res.statusCode).to.equal(404);
+            done();
+            }); 
+        });
     });
 });
 

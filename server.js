@@ -41,6 +41,9 @@ router.get('/reminders', function (req, res, next) {
         if (err) {
             res.send(err);
         } else {
+          if (!reminders.length || null) {
+            res.status(404) //server status
+          }
             res.json(reminders);
         }
     });
@@ -56,7 +59,7 @@ router.get('/reminderByCreateDate/:date', function(req, res) {
     };
   });
 });
-//TO DO search by content //change
+//TO DO search by content //change and test
 router.get('/reminders', function(req, res){
   collection.find({"text": req.query.content}).toArray(function(err, result){
     if (err) {
@@ -76,26 +79,27 @@ router.post('/reminders', function(req, res) {
 });
 
 router.put('/reminders/:reminderId', function(req, res, next) {
+  //set conditionally: if property - update. otherwise do nothing
+  //create an object if properties are on body then add them to the obj and pass to set!
+  //extracting out db query
   collection.findAndModify({
-    query: {_id: ObjectID(req.body._id)},
+    query: {_id: ObjectID(req.params.reminderId)},
     update: { 
-      $set: { 
-        text: req.body.text, 
-        expired_by: req.body.expired_by,
-        created_at: req.body.created_at 
-      } 
+      $set: {text: req.body.text}
     },
-    upsert: true,
+    upsert: false,
+    returnOriginal: false,
     new: true,
-  }),
+  },
   function(err, object) {
+    //console.log({err, object});
     if (err){
-        console.warn(err.message);  // returns error if no matching object found
+      res.status(500).json({})
     }else{
-        console.log(object);
+      res.status(200).json([object])
     }
-  }
-})
+  });
+});
 
 router.delete('/reminders/:reminderId', function(req, res) {
   collection.remove(
