@@ -173,7 +173,24 @@ describe('API', () => {
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(200);
                     expect(res.body).to.be.an("array");
-                    //expect(res.body[0].created_at).to.equal("2018-01-22");
+                    expect(res.body[0][0].created_at).to.equal("2018-01-22");
+                    done();
+                });
+            })
+        });
+    });
+
+    describe('GET by content', () => {
+        it('should get reminders by the searching content', done => {
+            chai.request(server)
+            .get('/api/reminders')
+            .end(function(err, res){
+                chai.request(server)
+                
+                .get('/api/reminderByContent/' + res.body[0].text)
+                .end((err, res) => {
+                    expect(res.statusCode).to.equal(200);
+                    expect(res.body[0][0].text).to.equal("MONGO");
                     done();
                 });
             })
