@@ -1,26 +1,26 @@
 const expect = require('chai').expect;
-
 const chaiHttp = require('chai-http');
 const server = require('./server');
 const chai = require('chai');
+const moment = require('moment');
 var mongojs = require('mongojs');
-var db = mongojs('mongodb://localhost:27017/Reminders'); //connect to DB
+var db = mongojs('mongodb://localhost:27017/Reminders');
 var collection = db.collection('reminders-collection');
 
 chai.use(chaiHttp);
 
 describe('API', () => {
-    //how to automatically spin up a mongo shell instance during the tests run //docker container nice to have you need mongo running on the standart port
     before(() => {
         db.on('connect', () => {
         console.log('database connected')
         });
     });
 
-    after(() => {
+    after((done) => {
         collection.remove({}, ()=> {
             db.close('disconnected', () => {
             console.log('database disconnected')
+            done()
             });
         });
     });
@@ -59,8 +59,7 @@ describe('API', () => {
         it('should post a new reminder', done => {
             let reminder = {
                 "text": "testing only",
-                "expired_by": "2018-01-24",
-                "created_at": "2018-01-22"
+                "expired_by": "2018-01-24"
             };
             
             chai.request(server)
@@ -117,7 +116,6 @@ describe('API', () => {
             .end((err, res) => {
                 chai.request(server)
                 .put('/api/reminders/' + res.body[0]._id)
-                //.send({text: 'MONGO', expired_by: '2025-03-15', created_at: res.body[0].created_at})
                 .send({text: 'MONGO'})
                 .end((err, res) => {
                     // console.log({err, res});
@@ -173,7 +171,7 @@ describe('API', () => {
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(200);
                     expect(res.body).to.be.an("array");
-                    expect(res.body[0][0].created_at).to.equal("2018-01-22");
+                    expect(res.body[0][0].created_at).to.equal(moment().format("YYYY-MM-DD"));
                     done();
                 });
             })
