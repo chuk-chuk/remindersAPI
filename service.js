@@ -1,4 +1,4 @@
-
+const moment = require('moment');
 const mongojs = require('mongojs');
 const db = mongojs('mongodb://localhost:27017/Reminders');
 const ObjectID = require('mongodb').ObjectID;
@@ -14,6 +14,14 @@ module.exports.getReminderByDate = (createdDate, cb) => {
 
 module.exports.getReminderByContent = (content, cb) => {
     collection.find({ text: content }, cb)
+}
+
+module.exports.postReminder = (content, expiredDate, cb) => {
+    collection.save({
+        text: content,
+        created_at: moment().format("YYYY-MM-DD"),
+        expired_by: expiredDate
+    }, cb)
 }
 
 module.exports.updateReminder = (id, newValueText, newValueExpiry, cb) => {
