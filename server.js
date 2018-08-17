@@ -46,7 +46,7 @@ router.get('/reminders', function (req, res, next) {
     });
 });
 
-router.get('/reminderByCreateDate/:date', function(req, res) {
+router.get('/reminders/date/:date', function(req, res) {
   var createdDate = req.params.date;
   service.getReminderByDate(createdDate, (err, result) => {
       if (err) {
@@ -57,7 +57,7 @@ router.get('/reminderByCreateDate/:date', function(req, res) {
   });
 });
 
-router.get('/reminderByContent/:content', function(req, res){
+router.get('/reminders/content/:content', function(req, res){
   var content = req.params.content;
   service.getReminderByContent(content, (err, result) => {
     if (err) {

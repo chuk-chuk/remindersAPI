@@ -162,12 +162,12 @@ describe('API', () => {
     });
 
     describe('GET by create date', () => {
-        it('should get reminders by the given date - /api/reminderByCreateDate/:date', done => {
+        it('should get reminders by the given date', done => {
             chai.request(server)
             .get('/api/reminders')
             .end(function(err, res){
                 chai.request(server)
-                .get('/api/reminderByCreateDate/' + res.body[0].created_at)
+                .get('/api/reminders/date/' + res.body[0].created_at)
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(200);
                     expect(res.body).to.be.an("array");
@@ -184,8 +184,7 @@ describe('API', () => {
             .get('/api/reminders')
             .end(function(err, res){
                 chai.request(server)
-                
-                .get('/api/reminderByContent/' + res.body[0].text)
+                .get('/api/reminders/content/' + res.body[0].text)
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(200);
                     expect(res.body[0][0].text).to.equal("MONGO");
