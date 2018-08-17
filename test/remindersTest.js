@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 const chaiHttp = require('chai-http');
-const server = require('./server');
+const server = require('../server');
 const chai = require('chai');
 const moment = require('moment');
 var mongojs = require('mongojs');
