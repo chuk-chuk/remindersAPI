@@ -3,7 +3,9 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const port = process.env.PORT || 8080;
-const externalRoutes = require('./routes/externalRoutes');
+const remindersRoutes = require('./routes/remindersRoutes');
+const userRoutes = require('./routes/userRoutes');
+const healthRoutes = require('./routes/healthRoutes');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -23,12 +25,17 @@ app.use((req, res, next) => {
     console.log('Body: ', req.body)
     console.log("💎 💎 💎 💎 💎 💎 💎 💎 💎 💎 💎") 
     next();
-  });
+});
 
 app.listen(port, () => {
     console.log('Listening on port ' + port);
 });
 
-app.use('/api', externalRoutes);
+// app.use('/token', generateToken)
+app.use('/health', healthRoutes);
+app.use('/user', userRoutes);
+app.use('/reminders', remindersRoutes);
+
+// error handling here after you ve called all the routes
 
 module.exports = app;

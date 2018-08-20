@@ -4,6 +4,8 @@ const db = mongojs('mongodb://localhost:27017/Reminders');
 const ObjectID = require('mongodb').ObjectID;
 const collection = db.collection('reminders-collection');
 
+//a new collection to store user names and passwords
+
 module.exports.getAllReminders = (cb) => {
     collection.find().toArray(cb);
 }

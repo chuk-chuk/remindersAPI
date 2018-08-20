@@ -25,36 +25,6 @@ describe('API', () => {
         });
     });
 
-    describe('Health point /api', () => {
-        it('should return 200', done => {
-            chai.request(server)
-                .get('/api')
-                .end((err, res) => {
-                expect(res.statusCode).to.equal(200);
-                done();
-            });
-        });
-        
-        it('should return 404', done => {
-            chai.request(server)
-            .get('/aaappii')
-            .end((err, res) => {
-                expect(res.statusCode).to.equal(404);
-                done();
-            });
-        });
-        
-        it('should get the welcome message', done => {
-            chai.request(server)
-            .get('/api')
-            .end((err, res) => {
-                expect(res.body.message).to.be.a('string');
-                expect(res.body.message).to.equal('hooray! welcome to our api!');
-                done();
-            });
-        });
-    });
-
     describe('POST', () => {
         it('should post a new reminder', done => {
             let reminder = {
@@ -63,7 +33,7 @@ describe('API', () => {
             };
             
             chai.request(server)
-            .post('/api/reminders')
+            .post('/reminders')
             .send(reminder)
             .end(function(err,res){
             if(err)
@@ -79,7 +49,7 @@ describe('API', () => {
     describe('GET all /api/reminders', () => {
         it('should get 200 when requesting all reminders', done => {
             chai.request(server)
-            .get('/api/reminders')
+            .get('/reminders')
             .end(function(err, res){
                 if (err)
                     return done(err);
@@ -93,7 +63,7 @@ describe('API', () => {
 
         it('should return an array of objects containing some properties', done => {
             chai.request(server)
-            .get('/api/reminders')
+            .get('/reminders')
             .end(function(err, res){
                 if (err)
                 return done(err);
@@ -112,10 +82,10 @@ describe('API', () => {
     describe('UPDATE', ()=> {
         it('should update the current reminder', done => {
             chai.request(server)
-            .get('/api/reminders')
+            .get('/reminders')
             .end((err, res) => {
                 chai.request(server)
-                .put('/api/reminders/' + res.body[0]._id)
+                .put('/reminders/' + res.body[0]._id)
                 .send({text: 'MONGO'})
                 .end((err, res) => {
                     // console.log({err, res});
@@ -134,7 +104,7 @@ describe('API', () => {
     describe('GET all /api/reminders', () => {
         it('should return 200', done => {
             chai.request(server)
-                .get('/api/reminders')
+                .get('/reminders')
                 .end((err, res) => {
                 expect(res.statusCode).to.equal(200);
                 done();
@@ -143,7 +113,7 @@ describe('API', () => {
 
         it('should return 404', done => {
             chai.request(server)
-                .get('/api/remindersssss')
+                .get('/remindersssss')
                 .end((err, res) => {
                 expect(res.statusCode).to.equal(404);
                 done();
@@ -152,7 +122,7 @@ describe('API', () => {
 
         it('should return an array of objects', done => {
             chai.request(server)
-                .get('/api/reminders')
+                .get('/reminders')
                 .end((err, res) => {
                     expect(res.body).to.be.an('array');
                     expect(res.body.length).to.equal(1);
@@ -164,10 +134,10 @@ describe('API', () => {
     describe('GET by create date', () => {
         it('should get reminders by the given date', done => {
             chai.request(server)
-            .get('/api/reminders')
+            .get('/reminders')
             .end(function(err, res){
                 chai.request(server)
-                .get('/api/reminders/date/' + res.body[0].created_at)
+                .get('/reminders/date/' + res.body[0].created_at)
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(200);
                     expect(res.body).to.be.an("array");
@@ -181,10 +151,10 @@ describe('API', () => {
     describe('GET by content', () => {
         it('should get reminders by the searching content', done => {
             chai.request(server)
-            .get('/api/reminders')
+            .get('/reminders')
             .end(function(err, res){
                 chai.request(server)
-                .get('/api/reminders/content/' + res.body[0].text)
+                .get('/reminders/content/' + res.body[0].text)
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(200);
                     expect(res.body[0][0].text).to.equal("MONGO");
@@ -197,10 +167,10 @@ describe('API', () => {
     describe('DELETE', () => {
         it('should delete the reminder', done => {
             chai.request(server)
-            .get('/api/reminders')
+            .get('/reminders')
             .end(function(err, res){
                 chai.request(server)
-                    .delete('/api/reminders/' + res.body[0]._id)
+                    .delete('/reminders/' + res.body[0]._id)
                     .end(function(err, res){
                         console.log('reminder deleted');
                         expect(res.body.message).to.equal('The information is not accessible anymore');
@@ -213,7 +183,7 @@ describe('API', () => {
     describe('GET no reminders', () => {
         it('should NOT get any reminders and send 404', done => {
             chai.request(server)
-            .get('/api/reminders')
+            .get('/reminders')
             .end((err, res) => {
                 expect(res.statusCode).to.equal(404);
             done();
