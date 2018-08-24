@@ -1,4 +1,4 @@
-//MONGOOSE ONLY
+// MONGOOSE ONLY
 // const mongoose = require('mongoose');
 // const Schema = mongoose.Schema;
 

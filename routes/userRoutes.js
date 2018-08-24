@@ -1,7 +1,8 @@
+
 const helper = require('../helper');
 
 module.exports = (() => {
-    'use strict';
+    /* eslint-disable global-require */
     const router = require('express').Router();
 
     router.get('/', helper.helloUser);
