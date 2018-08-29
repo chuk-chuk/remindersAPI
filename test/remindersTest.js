@@ -10,7 +10,7 @@ const collection = db.collection('reminders-collection');
 
 chai.use(chaiHttp);
 
-describe('API', () => {
+describe('Reminders API', () => {
     before(() => {
         db.on('connect', () => {
             console.log('database connected');

@@ -35,7 +35,7 @@ app.listen(port, () => {
 
 // app.use('/token', generateToken)
 app.use('/health', healthRoutes);
-app.use('/user', userRoutes);
+app.use('/users', userRoutes);
 app.use('/reminders', remindersRoutes);
 
 app.use((req, res) => {
