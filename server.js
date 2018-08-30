@@ -29,6 +29,11 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use((req, res, next) => {
+   // VERIFY TOKEN HERE UNLESS ROUTE IS /token or POST /users 
+    next();
+});
+
 app.listen(port, () => {
     console.log('Listening on port ' + port);
 });

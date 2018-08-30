@@ -1,7 +1,10 @@
 const mongojs = require('mongojs');
 
-const db = mongojs('mongodb://localhost:27017/Reminders');
 const { ObjectID } = require('mongodb');
+
+const { hashPassword } = require('../helpers/hash');
+
+const db = mongojs('mongodb://localhost:27017/Reminders');
 
 const collection = db.collection('users-collection');
 
@@ -9,11 +12,18 @@ module.exports.getAllUsers = (cb) => {
     collection.find().toArray(cb);
 };
 
+module.exports.getUserByEmail = (email, cb) => {
+    collection.find({ email: email.toLowerCase(), }).toArray(cb);
+};
+
 module.exports.postUser = (userEmail, userPassword, cb) => {
-    collection.save({
-        email: userEmail,
-        password: userPassword
-    }, cb);
+    hashPassword(userPassword, (err, hash) => {
+        collection.save({
+            email: userEmail.toLowerCase(),
+            password: hash
+        }, cb);
+    });
+    
 };
 
 module.exports.updateUser = (id, newEmail, newPassword, cb) => {

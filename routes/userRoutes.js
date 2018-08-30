@@ -1,5 +1,8 @@
 const userDB = require('../query/userDB');
 
+const MIN_PASSWORD_LENGTH = 5;
+const MAX_PASSWORD_LENGTH = 10;
+
 module.exports = (() => {
     /* eslint-disable global-require */
     const router = require('express').Router();
@@ -19,12 +22,46 @@ module.exports = (() => {
     });
 
     router.post('/', (req, res, next) => {
-        userDB.postUser(req.body.email, req.body.password, (err, object) => {
+        if (!req.body) { return res.sendStatus(400); }
+        
+        if (!req.body.email || !req.body.password) {
+            return res.status(400).send('Missing email or password');
+        }
+        
+        if (req.body.password.length < MIN_PASSWORD_LENGTH
+            || req.body.password.length > MAX_PASSWORD_LENGTH) {
+            return res.status(400).send(
+                'Password must be between ' + MIN_PASSWORD_LENGTH + ' and '
+                    + MAX_PASSWORD_LENGTH + ' characters long'
+            );
+        }
+            
+        userDB.getUserByEmail(req.body.email, (err, users) => {
+            if (err) return next(err);
+        
+            if (users.length > 0) {
+                return res.status(409).send('A user with the specified email already exists');
+            }
+
+            userDB.postUser(req.body.email, req.body.password, (err, object) => {
+                if (err) {
+                    err.statusCode = 502;
+                    return next(err);
+                } else {
+                    return res.status(200).json([object]);
+                }
+            });
+        });  
+    });
+
+    router.get('/email/:email', (req, res, next) => {
+        const { email } = req.params;
+        userDB.getUserByEmail(email, (err, result) => {
             if (err) {
-                err.statusCode = 502;
+                err.statusCode = 503;
                 return next(err);
             } else {
-                return res.status(200).json([object]);
+                return res.json([result]);
             }
         });
     });

@@ -29,7 +29,7 @@ describe('Users endpoint', () => {
         it('should post a user', (done) => {
             const user = {
                 email: 'rex@rexing.com',
-                password: '34973509379'
+                password: '3497307'
             };
 
             chai.request(server)
@@ -94,6 +94,20 @@ describe('Users endpoint', () => {
                     console.log('UPDATED USERS+++++++++', res.body);
                     expect(res.body.length).to.equal(1);
                     expect(res.body[0].email).to.equal('updatedEmail@email.com');
+                    done();
+                });
+        });
+    });
+
+    describe('Get user by email', () => {
+        it('should return a user by given email', (done) => {
+            chai.request(server)
+                .get('/users')
+                .end((err, res) => {
+                    chai.request(server)
+                        .get('/users/email/' + res.body[0].email);
+                    expect(res.body[0].email).to.equal('updatedEmail@email.com');
+                    expect(res.body.length).to.equal(1);
                     done();
                 });
         });

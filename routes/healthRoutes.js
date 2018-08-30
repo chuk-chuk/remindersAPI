@@ -1,4 +1,4 @@
-const helper = require('../helper');
+const helper = require('../helpers/helper');
 
 module.exports = (() => {
     /* eslint-disable global-require */
