@@ -3,11 +3,16 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 
 const port = process.env.PORT || 8080;
+
 const remindersRoutes = require('./routes/remindersRoutes');
 const userRoutes = require('./routes/userRoutes');
 const healthRoutes = require('./routes/healthRoutes');
+const generateToken = require('./routes/generateToken');
+
+const config = require('./helpers/config');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -30,15 +35,32 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-   // VERIFY TOKEN HERE UNLESS ROUTE IS /token or POST /users 
-    next();
+    // ??? add another if VERIFY TOKEN HERE UNLESS ROUTE IS /authenticate or POST /users
+    // check header or url parameters or post parameters for token
+    const token = req.body.token || req.query.token || req.headers['x-access-token'];
+    // decode token
+    if (token) {
+        // verifies secret and checks exp
+        jwt.verify(token, config.secret, (err, decoded) => {
+            if (err) {
+                return res.json({ auth: false, message: 'Failed to authenticate token.' });
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                next();
+            }
+        });
+    } else {
+        // if there is no token, return an error
+        return res.status(403).send({ auth: false, message: 'No token provided.' });
+    }
 });
 
 app.listen(port, () => {
     console.log('Listening on port ' + port);
 });
 
-// app.use('/token', generateToken)
+app.use('/authenticate', generateToken); // If the email and password are valid - create a token and pass that back
 app.use('/health', healthRoutes);
 app.use('/users', userRoutes);
 app.use('/reminders', remindersRoutes);

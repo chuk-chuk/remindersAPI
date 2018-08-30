@@ -2,6 +2,8 @@
 
 A REST API built with MongoDB, Node.js and Express.
 Make sure you have Mongo Driver installed and have a mongo shell running before launching the server.
+Securing Node.js RESTful API with JSON Web Tokens, so User needs to be authorised to access resources.
+Users passwords are encrypted with npm bcript.
 
 - `git clone`
 - `cd into dir`
