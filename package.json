@@ -3,7 +3,7 @@
     "main": "server.js",
     "scripts": {
         "dev": "nodemon server.js",
-        "test": "mocha --exit --timeout 10000",
+        "test": "mocha --exit --timeout 10000", 
         "lint": "./node_modules/.bin/eslint ."
     },
     "dependencies": {
@@ -28,6 +28,8 @@
         "eslint-plugin-jsx-a11y": "^6.1.1",
         "eslint-plugin-react": "^7.11.1",
         "mocha": "^5.2.0",
-        "nodemon": "^1.12.6"
+        "nodemon": "^1.12.6",
+        "superagent": "^3.8.3",
+        "supertest": "^3.1.0"
     }
 }
