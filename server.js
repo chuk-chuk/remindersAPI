@@ -28,6 +28,7 @@ app.use((req, res, next) => {
     console.log('Params: ', req.params);
     console.log('Path: ', req.path);
     console.log('Query: ', req.query); 
+    console.log('Headers: ', req.headers); 
     console.log('Method: ', req.method); 
     console.log('Body: ', req.body);
     console.log('💎 💎 💎 💎 💎 💎 💎 💎 💎 💎 💎'); 
@@ -35,10 +36,21 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    // ??? add another if VERIFY TOKEN HERE UNLESS ROUTE IS /authenticate or POST /users
+    console.log(req.originalUrl);
+    
+    // g VERIFY TOKEN HERE UNLESS ROUTE IS /authenticate or POST /users
+    if (req._parsedUrl.pathname === ('/authenticate')) {
+        return next();
+    } 
+    
+    if (req.originalUrl === '/users' && req.method === 'POST') {
+        return next();
+    }
+    
     // check header or url parameters or post parameters for token
-    const token = req.body.token || req.query.token || req.headers['x-access-token'];
+    const token = req.headers['x-user-token'];
     // decode token
+    console.log(")))))))))", token);
     if (token) {
         // verifies secret and checks exp
         jwt.verify(token, config.secret, (err, decoded) => {
@@ -54,6 +66,7 @@ app.use((req, res, next) => {
         // if there is no token, return an error
         return res.status(403).send({ auth: false, message: 'No token provided.' });
     }
+    
 });
 
 app.listen(port, () => {
@@ -65,10 +78,10 @@ app.use('/health', healthRoutes);
 app.use('/users', userRoutes);
 app.use('/reminders', remindersRoutes);
 
+// error handling here after you ve called all the routes
 app.use((req, res) => {
     res.status(404).json();
 });
-// error handling here after you ve called all the routes
 
 // 50x
 /* eslint-disable no-unused-vars */
