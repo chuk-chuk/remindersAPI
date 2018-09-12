@@ -1,0 +1,56 @@
+const { expect } = require('chai');
+const chai = require('chai');
+const mongojs = require('mongojs');
+const chaiHttp = require('chai-http');
+const server = require('../server');
+
+const db = mongojs('mongodb://localhost:27017/Reminders');
+const collection = db.collection('users-collection');
+
+const user = {
+    email: 'rex@rexing.com',
+    password: '3497307'
+};
+chai.use(chaiHttp);
+
+describe('Token endpoint', () => {
+    before((done) => {
+        chai.request(server)
+            .post('/users')
+            .send(user)
+            .end((err) => {
+                if (err) return done(err);
+                else console.log('user saved');
+                done();
+            });
+    });
+
+    after((done) => {
+        collection.remove({}, () => {
+            db.close('disconnected', () => {
+                console.log('database disconnected');
+                done();
+            });
+        });
+    });
+
+    describe('Get token endpoint', () => {
+        it('should get a token', (done) => {
+
+
+            chai.request(server)
+                .post('/authenticate')
+                .send(user)
+                .end((err, res) => {
+                    if (err) return done(err);
+                    else console.log('user saved');
+                    console.log('TOKEN', res.body);
+                    expect(res.statusCode).to.equal(200);
+                    // expect(res.body.token).to.contain('token');
+                    expect(res.body.token).to.be.a('string');
+
+                    done();
+                });
+        });
+    });
+});

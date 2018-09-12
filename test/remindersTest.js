@@ -10,12 +10,33 @@ const collection = db.collection('reminders-collection');
 
 chai.use(chaiHttp);
 
-describe('Reminders API', () => {
+const user = {
+    email: 'rexx@rexing.com',
+    password: '3497307'
+};
+
+let token;
+
+describe.only('Reminders API', () => {
     before(() => {
         db.on('connect', () => {
             console.log('database connected');
         });
     });
+    before((done) => {
+
+        chai.request(server)
+            .post('/authenticate')
+            .send(user)
+            .end((err, res) => {
+                if (err) return done(err);
+                else console.log('user saved');
+                console.log('TOKEN', res.body);
+                token = res.body.token;
+                done();
+            });
+    });
+
 
     after((done) => {
         collection.remove({}, () => {
@@ -32,16 +53,16 @@ describe('Reminders API', () => {
                 text: 'testing only',
                 expired_by: '2018-01-24'
             };
-            
             chai.request(server)
                 .post('/reminders')
+                .set('x-user-token', token)
                 .send(reminder)
                 .end((err, res) => {
                     if (err) return done(err);
                     else console.log('Reminder posted');
                     expect(res.statusCode).to.equal(200);
                     done();
-                });
+                });      
         });
     });
 
@@ -49,6 +70,7 @@ describe('Reminders API', () => {
         it('should get 200 when requesting all reminders', (done) => {
             chai.request(server)
                 .get('/reminders')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     if (err) return done(err);
                     else {
@@ -62,6 +84,7 @@ describe('Reminders API', () => {
         it('should return an array of objects containing some properties', (done) => {
             chai.request(server)
                 .get('/reminders')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     if (err) return done(err);
                     else {
@@ -80,9 +103,11 @@ describe('Reminders API', () => {
         it('should update the current reminder', (done) => {
             chai.request(server)
                 .get('/reminders')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     chai.request(server)
                         .put('/reminders/' + res.body[0]._id)
+                        .set('x-user-token', token)
                         .send({ text: 'MONGO' })
                         .end((err, res) => {
                             // console.log({err, res});
@@ -101,6 +126,7 @@ describe('Reminders API', () => {
         it('should return 200', (done) => {
             chai.request(server)
                 .get('/reminders')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(200);
                     done();
@@ -110,6 +136,7 @@ describe('Reminders API', () => {
         it('should return 404', (done) => {
             chai.request(server)
                 .get('/remindersssss')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(404);
                     done();
@@ -119,6 +146,7 @@ describe('Reminders API', () => {
         it('should return an array of objects', (done) => {
             chai.request(server)
                 .get('/reminders')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     expect(res.body).to.be.an('array');
                     expect(res.body.length).to.equal(1);
@@ -131,9 +159,11 @@ describe('Reminders API', () => {
         it('should get reminders by the given date', (done) => {
             chai.request(server)
                 .get('/reminders')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     chai.request(server)
                         .get('/reminders/date/' + res.body[0].created_at)
+                        .set('x-user-token', token)
                         .end((err, res) => {
                             expect(res.statusCode).to.equal(200);
                             expect(res.body).to.be.an('array');
@@ -148,9 +178,11 @@ describe('Reminders API', () => {
         it('should get reminders by the searching content', (done) => {
             chai.request(server)
                 .get('/reminders')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     chai.request(server)
                         .get('/reminders/content/' + res.body[0].text)
+                        .set('x-user-token', token)
                         .end((err, res) => {
                             expect(res.statusCode).to.equal(200);
                             expect(res.body[0][0].text).to.equal('MONGO');
@@ -164,9 +196,11 @@ describe('Reminders API', () => {
         it('should delete the reminder', (done) => {
             chai.request(server)
                 .get('/reminders')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     chai.request(server)
                         .delete('/reminders/' + res.body[0]._id)
+                        .set('x-user-token', token)
                         .end((err, res) => {
                             console.log('reminder deleted');
                             expect(res.statusCode).to.equal(200);
@@ -180,6 +214,7 @@ describe('Reminders API', () => {
         it('should NOT get any reminders and send 404', (done) => {
             chai.request(server)
                 .get('/reminders')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(404);
                     done();
