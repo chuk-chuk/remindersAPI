@@ -25,12 +25,3 @@ before((done) => {
         });
 });
 
-// after((done) => { // add additional collection to remove reminders-collection
-//     collection.remove({}, () => {
-//         db.close('disconnected', () => {
-//             console.log('database disconnected');
-//             done();
-//         });
-//     });
-// });
-

@@ -7,22 +7,18 @@ const server = require('../server');
 const db = mongojs('mongodb://localhost:27017/Reminders');
 const collection = db.collection('users-collection');
 
-const user = {
-    email: 'rex@rexing.com',
-    password: '3497307'
-};
 chai.use(chaiHttp);
 
+const user = {
+    email: 'rexx@rexing.com',
+    password: '3497307'
+};
+
 describe('Token endpoint', () => {
-    before((done) => {
-        chai.request(server)
-            .post('/users')
-            .send(user)
-            .end((err) => {
-                if (err) return done(err);
-                else console.log('user saved');
-                done();
-            });
+    before(() => {
+        db.on('connect', () => {
+            console.log('database connected');
+        });
     });
 
     after((done) => {
@@ -37,16 +33,13 @@ describe('Token endpoint', () => {
     describe('Get token endpoint', () => {
         it('should get a token', (done) => {
 
-
             chai.request(server)
                 .post('/authenticate')
                 .send(user)
                 .end((err, res) => {
                     if (err) return done(err);
-                    else console.log('user saved');
-                    console.log('TOKEN', res.body);
+                    else console.log('user authenticated');
                     expect(res.statusCode).to.equal(200);
-                    // expect(res.body.token).to.contain('token');
                     expect(res.body.token).to.be.a('string');
 
                     done();

@@ -1,7 +1,7 @@
 const { expect } = require('chai');
+const chaiHttp = require('chai-http');
 const chai = require('chai');
 const mongojs = require('mongojs');
-const chaiHttp = require('chai-http');
 const server = require('../server');
 
 const db = mongojs('mongodb://localhost:27017/Reminders');
@@ -22,16 +22,15 @@ describe('Users endpoint', () => {
             console.log('database connected');
         });
     });
-
     before((done) => {
-
+        
         chai.request(server)
             .post('/authenticate')
             .send(user)
             .end((err, res) => {
                 if (err) return done(err);
-                else console.log('user processed');
-                console.log('TOKEN', res.body);
+                else console.log('user authenticated');
+                console.log('TOKEN from USERS-TESTS', res.body);
                 token = res.body.token;
                 done();
             });
@@ -153,11 +152,11 @@ describe('Users endpoint', () => {
                 .end((err, res) => {
                     if (err) return done(err);
                     else console.log('user saved');
-                    console.log("%%%%%", res.body)
+                    console.log('%%%%%', res.body);
                     expect(res.statusCode).to.equal(200);
                     done();
                 });
         });
     });
-    //you expect a 404 if an authiticated user hits a non-exsistant endpoint
+    // you expect a 404 if an authiticated user hits a non-exsistant endpoint
 });

@@ -30,7 +30,7 @@ describe('Reminders API', () => {
             .send(user)
             .end((err, res) => {
                 if (err) return done(err);
-                else console.log('user saved');
+                else console.log('user authenticated');
                 console.log('TOKEN', res.body);
                 token = res.body.token;
                 done();
