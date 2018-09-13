@@ -9,11 +9,32 @@ const collection = db.collection('users-collection');
 
 chai.use(chaiHttp);
 
-describe('Users endpoint', () => {
+const user = {
+    email: 'charley@charley.com',
+    password: '34dgg307'
+};
+
+let token;
+
+describe.only('Users endpoint', () => {
     before(() => {
         db.on('connect', () => {
             console.log('database connected');
         });
+    });
+
+    before((done) => {
+
+        chai.request(server)
+            .post('/authenticate')
+            .send(user)
+            .end((err, res) => {
+                if (err) return done(err);
+                else console.log('user processed');
+                console.log('TOKEN', res);
+                //token = res.body.token;
+                done();
+            });
     });
 
     after((done) => {
@@ -25,25 +46,6 @@ describe('Users endpoint', () => {
         });
     });
 
-    describe('Post users endpoint', () => {
-        it('should post a user', (done) => {
-            const user = {
-                email: 'rex@rexing.com',
-                password: '3497307'
-            };
-
-            chai.request(server)
-                .post('/users')
-                .send(user)
-                .end((err, res) => {
-                    if (err) return done(err);
-                    else console.log('user saved');
-                    expect(res.statusCode).to.equal(200);
-                    done();
-                });
-        });
-    });
-    
     describe('Get users endpoint', () => {
         it('should return 200', (done) => {
             chai.request(server)
@@ -128,4 +130,24 @@ describe('Users endpoint', () => {
                 });
         });
     });
+
+    // describe('Post users endpoint', () => {
+    //     it('should post a user', (done) => {
+    //         const user = {
+    //             email: 'rex@rexing.com',
+    //             password: '3497307'
+    //         };
+
+    //         chai.request(server)
+    //             .post('/users')
+    //             .send(user)
+    //             .end((err, res) => {
+    //                 if (err) return done(err);
+    //                 else console.log('user saved');
+    //                 console.log("%%%%%", res.body)
+    //                 expect(res.statusCode).to.equal(200);
+    //                 done();
+    //             });
+    //     });
+    // });
 });

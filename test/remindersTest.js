@@ -17,7 +17,7 @@ const user = {
 
 let token;
 
-describe.only('Reminders API', () => {
+describe('Reminders API', () => {
     before(() => {
         db.on('connect', () => {
             console.log('database connected');
