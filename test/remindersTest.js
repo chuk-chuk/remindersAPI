@@ -221,6 +221,7 @@ describe('Reminders API', () => {
                 }); 
         });
     });
+    //you expect a 404 if an authiticated user hits a non-exsistant endpoint
 });
 
         

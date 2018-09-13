@@ -17,11 +17,11 @@ describe('API health endpoints ', () => {
                 });
         });
         
-        it('should return 404', (done) => {
+        it('should return 403 when no endpoint exists', (done) => {
             chai.request(server)
                 .get('/aaappii')
                 .end((err, res) => {
-                    expect(res.statusCode).to.equal(404);
+                    expect(res.statusCode).to.equal(403);
                     done();
                 });
         });

@@ -10,13 +10,13 @@ const collection = db.collection('users-collection');
 chai.use(chaiHttp);
 
 const user = {
-    email: 'charley@charley.com',
-    password: '34dgg307'
+    email: 'rexx@rexing.com',
+    password: '3497307'
 };
 
 let token;
 
-describe.only('Users endpoint', () => {
+describe('Users endpoint', () => {
     before(() => {
         db.on('connect', () => {
             console.log('database connected');
@@ -31,8 +31,8 @@ describe.only('Users endpoint', () => {
             .end((err, res) => {
                 if (err) return done(err);
                 else console.log('user processed');
-                console.log('TOKEN', res);
-                //token = res.body.token;
+                console.log('TOKEN', res.body);
+                token = res.body.token;
                 done();
             });
     });
@@ -50,6 +50,7 @@ describe.only('Users endpoint', () => {
         it('should return 200', (done) => {
             chai.request(server)
                 .get('/users')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     expect(res.statusCode).to.equal(200);
                     done();
@@ -59,6 +60,7 @@ describe.only('Users endpoint', () => {
         it('should return all saved users', (done) => {
             chai.request(server)
                 .get('/users')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     console.log('USERS+++++++++', res.body);
                     expect(res.body.length).to.equal(1);
@@ -71,9 +73,11 @@ describe.only('Users endpoint', () => {
         it('should update user details', (done) => {
             chai.request(server)
                 .get('/users')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     chai.request(server)
                         .put('/users/' + res.body[0]._id)
+                        .set('x-user-token', token)
                         .send({ email: 'updatedEmail@email.com' })
                         .end((err, res) => {
                             if (err) return done(err);
@@ -92,6 +96,7 @@ describe.only('Users endpoint', () => {
         it('should return all updated users', (done) => {
             chai.request(server)
                 .get('/users')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     console.log('UPDATED USERS+++++++++', res.body);
                     expect(res.body.length).to.equal(1);
@@ -105,9 +110,11 @@ describe.only('Users endpoint', () => {
         it('should return a user by given email', (done) => {
             chai.request(server)
                 .get('/users')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     chai.request(server)
-                        .get('/users/email/' + res.body[0].email);
+                        .get('/users/email/' + res.body[0].email)
+                        .set('x-user-token', token);
                     expect(res.body[0].email).to.equal('updatedEmail@email.com');
                     expect(res.body.length).to.equal(1);
                     done();
@@ -119,9 +126,11 @@ describe.only('Users endpoint', () => {
         it('should remove user from db', (done) => {
             chai.request(server)
                 .get('/users')
+                .set('x-user-token', token)
                 .end((err, res) => {
                     chai.request(server)
                         .delete('/users/' + res.body[0]._id)
+                        .set('x-user-token', token)
                         .end((err, res) => {
                             console.log('user removed');
                             expect(res.statusCode).to.equal(200);
@@ -131,23 +140,24 @@ describe.only('Users endpoint', () => {
         });
     });
 
-    // describe('Post users endpoint', () => {
-    //     it('should post a user', (done) => {
-    //         const user = {
-    //             email: 'rex@rexing.com',
-    //             password: '3497307'
-    //         };
+    describe('Post users endpoint', () => {
+        it('should post a user', (done) => {
+            const user = {
+                email: 'fdhgfj@rexing.com',
+                password: '3497307'
+            };
 
-    //         chai.request(server)
-    //             .post('/users')
-    //             .send(user)
-    //             .end((err, res) => {
-    //                 if (err) return done(err);
-    //                 else console.log('user saved');
-    //                 console.log("%%%%%", res.body)
-    //                 expect(res.statusCode).to.equal(200);
-    //                 done();
-    //             });
-    //     });
-    // });
+            chai.request(server)
+                .post('/users')
+                .send(user)
+                .end((err, res) => {
+                    if (err) return done(err);
+                    else console.log('user saved');
+                    console.log("%%%%%", res.body)
+                    expect(res.statusCode).to.equal(200);
+                    done();
+                });
+        });
+    });
+    //you expect a 404 if an authiticated user hits a non-exsistant endpoint
 });

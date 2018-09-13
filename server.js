@@ -36,10 +36,15 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    console.log(req.originalUrl);
+    console.log("req.originalUrl", req.originalUrl);
+    console.log("req._parsedUrl.pathname", req._parsedUrl.pathname);
     
     // g VERIFY TOKEN HERE UNLESS ROUTE IS /authenticate or POST /users
     if (req._parsedUrl.pathname === ('/authenticate')) {
+        return next();
+    } 
+
+    if (req._parsedUrl.pathname === ('/health')) {
         return next();
     } 
     
