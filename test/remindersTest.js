@@ -32,6 +32,7 @@ describe('Reminders API', () => {
                 if (err) return done(err);
                 else console.log('user authenticated');
                 console.log('TOKEN', res.body);
+                /* eslint-disable prefer-destructuring */
                 token = res.body.token;
                 done();
             });

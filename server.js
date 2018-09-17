@@ -55,7 +55,6 @@ app.use((req, res, next) => {
     // check header or url parameters or post parameters for token
     const token = req.headers['x-user-token'];
     // decode token
-    console.log(")))))))))", token);
     if (token) {
         // verifies secret and checks exp
         jwt.verify(token, config.secret, (err, decoded) => {

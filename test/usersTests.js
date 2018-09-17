@@ -23,14 +23,14 @@ describe('Users endpoint', () => {
         });
     });
     before((done) => {
-        
+
         chai.request(server)
             .post('/authenticate')
             .send(user)
             .end((err, res) => {
                 if (err) return done(err);
                 else console.log('user authenticated');
-                console.log('TOKEN from USERS-TESTS', res.body);
+                /* eslint-disable prefer-destructuring */
                 token = res.body.token;
                 console.log(res.error);
                 done();
@@ -62,15 +62,14 @@ describe('Users endpoint', () => {
                 .get('/users')
                 .set('x-user-token', token)
                 .end((err, res) => {
-                    console.log('USERS+++++++++', res.body);
                     expect(res.body.length).to.equal(1);
                     done();
                 });
         });
     });
-    
+
     describe('Put endpoint', () => {
-        it('should update user details', (done) => {
+        it('should update user details: email', (done) => {
             chai.request(server)
                 .get('/users')
                 .set('x-user-token', token)
@@ -90,6 +89,26 @@ describe('Users endpoint', () => {
 
                 });
         });
+        it('should update user details: password', (done) => {
+            chai.request(server)
+                .get('/users')
+                .set('x-user-token', token)
+                .end((err, res) => {
+                    chai.request(server)
+                        .put('/users/' + res.body[0]._id)
+                        .set('x-user-token', token)
+                        .send({ password: '23644' })
+                        .end((err, res) => {
+                            if (err) return done(err);
+                            else {
+                                expect(res.statusCode).to.equal(200);
+                                expect(res.body[0].password).to.equal('23644');
+                                done();
+                            }
+                        });
+
+                });
+        });
     });
 
     describe('Get users endpoint', () => {
@@ -98,7 +117,6 @@ describe('Users endpoint', () => {
                 .get('/users')
                 .set('x-user-token', token)
                 .end((err, res) => {
-                    console.log('UPDATED USERS+++++++++', res.body);
                     expect(res.body.length).to.equal(1);
                     expect(res.body[0].email).to.equal('updatedEmail@email.com');
                     done();
@@ -153,7 +171,6 @@ describe('Users endpoint', () => {
                 .end((err, res) => {
                     if (err) return done(err);
                     else console.log('user saved');
-                    console.log('%%%%%', res.body);
                     expect(res.statusCode).to.equal(200);
                     done();
                 });

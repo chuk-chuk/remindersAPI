@@ -5,7 +5,6 @@ const chaiHttp = require('chai-http');
 const server = require('../server');
 
 const db = mongojs('mongodb://localhost:27017/Reminders');
-const collection = db.collection('users-collection');
 
 chai.use(chaiHttp);
 

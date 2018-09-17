@@ -8,15 +8,20 @@ module.exports = (() => {
     const router = require('express').Router();
 
     router.get('/', (req, res, next) => {
-        userDB.getAllUsers((err, result) => {
+        userDB.getAllUsers((err, users) => {
             if (err) {
                 err.statusCode = 502;
                 return next(err);
             } else {
-                if (!result.length) {
+                if (!users.length) {
                     return next({ statusCode: 404 });
                 }
-                return res.json(result);
+
+                users = users.map((user) => {
+                    return { email: user.email, _id: user._id };
+                });
+
+                return res.json(users);
             }
         });
     });
@@ -43,12 +48,16 @@ module.exports = (() => {
                 return res.status(409).send('A user with the specified email already exists');
             }
 
-            userDB.postUser(req.body.email, req.body.password, (err, object) => {
+            userDB.postUser(req.body.email, req.body.password, (err, user) => {
                 if (err) {
                     err.statusCode = 502;
                     return next(err);
                 } else {
-                    return res.status(200).json([object]);
+                    const modifiedUser = { 
+                        email: user.email
+                    };
+                    console.log(modifiedUser);
+                    return res.status(200).json([modifiedUser]);
                 }
             });
         });  
@@ -56,37 +65,37 @@ module.exports = (() => {
 
     router.get('/email/:email', (req, res, next) => {
         const { email } = req.params;
-        userDB.getUserByEmail(email, (err, result) => {
+        userDB.getUserByEmail(email, (err, user) => {
             if (err) {
                 err.statusCode = 503;
                 return next(err);
             } else {
-                return res.json([result]);
+                return res.json([user]);
             }
         });
     });
 
     router.put('/:userId', (req, res, next) => {
-        userDB.updateUser(req.params.userId, req.body.email, req.body.password, (err, object) => {
+        userDB.updateUser(req.params.userId, req.body.email, req.body.password, (err, user) => {
             if (err) {
                 err.statusCode = 502;
                 return next(err);
             } else {
-                return res.status(200).json([object]);
+                return res.status(200).json([user]);
             }
         });
     });
     
     router.delete('/:userId', (req, res, next) => {
-        userDB.deleteUserById(req.params.userId, (err, result) => {
+        userDB.deleteUserById(req.params.userId, (err, user) => {
             if (err) {
                 err.statusCode = 502;
                 return next(err);
             }
-            if (result.n < 1) {
+            if (user.n < 1) {
                 return next();
             }
-            return res.status(200).json([result]);
+            return res.status(200).json([user]);
         });
     });
 
