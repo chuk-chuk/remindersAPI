@@ -32,6 +32,7 @@ describe('Users endpoint', () => {
                 else console.log('user authenticated');
                 console.log('TOKEN from USERS-TESTS', res.body);
                 token = res.body.token;
+                console.log(res.error);
                 done();
             });
     });

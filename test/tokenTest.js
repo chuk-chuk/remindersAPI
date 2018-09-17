@@ -22,11 +22,9 @@ describe('Token endpoint', () => {
     });
 
     after((done) => {
-        collection.remove({}, () => {
-            db.close('disconnected', () => {
-                console.log('database disconnected');
-                done();
-            });
+        db.close('disconnected', () => {
+            console.log('database disconnected');
+            done();
         });
     });
 
