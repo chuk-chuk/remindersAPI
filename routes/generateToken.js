@@ -33,7 +33,8 @@ module.exports = (() => {
                 }
                 
                 const payload = {
-                    email: users[0].email 
+                    id: users[0]._id,
+                    email: users[0].email
                 };
                 
                 const token = jwt.sign(payload, config.secret, {
