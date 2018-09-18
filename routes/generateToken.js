@@ -9,12 +9,12 @@ module.exports = (() => {
     const router = require('express').Router();
 
     router.post('/', (req, res, next) => {
-        console.log(req.body);
+        console.log(req.body); // how to exclude password from outputting with req.body in server.js?
         
         // Check user against db
         userDB.getUserByEmail(req.body.email, (err, users) => {
-            console.log(err);
-            console.log(users);
+            console.log("ERROR", err);
+            console.log("getUserByEmail", users);
             if (!users.length) {
                 return next();
             }
@@ -25,8 +25,8 @@ module.exports = (() => {
             }
 
             comparePasswords(req.body.password, users[0].password, (err, result) => {
-                console.log({ err });
-                console.log({ result });
+                // console.log({ err });
+                // console.log({ result });
                 if (!result) {
                     const err = new Error('Nope go away');
                     return next(err);
