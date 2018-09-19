@@ -32,7 +32,6 @@ describe('Users endpoint', () => {
                 else console.log('user authenticated');
                 /* eslint-disable prefer-destructuring */
                 token = res.body.token;
-                console.log(res.error);
                 done();
             });
     });

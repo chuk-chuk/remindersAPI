@@ -4,6 +4,9 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+// const morgan = require('morgan');
+const expressWinston = require('express-winston');
+const winston = require('winston');
 
 const port = process.env.PORT || 8080;
 
@@ -24,16 +27,28 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use((req, res, next) => {
-    console.log('Params: ', req.params);
-    console.log('Path: ', req.path);
-    console.log('Query: ', req.query); 
-    console.log('Headers: ', req.headers); 
-    console.log('Method: ', req.method); 
-    console.log('Body: ', req.body);
-    console.log('💎 💎 💎 💎 💎 💎 💎 💎 💎 💎 💎'); 
-    next();
-});
+// app.use(morgan('common'));
+
+app.use(expressWinston.logger({
+    format: winston.format.json,
+    transports: [
+        new winston.transports.Console({
+            json: true,
+            colorize: true
+        })
+    ]
+}));
+
+// app.use((req, res, next) => {
+//     console.log('Params: ', req.params);
+//     console.log('Path: ', req.path);
+//     console.log('Query: ', req.query); 
+//     console.log('Headers: ', req.headers); 
+//     console.log('Method: ', req.method); 
+//     console.log('Body: ', req.body);
+//     console.log('💎 💎 💎 💎 💎 💎 💎 💎 💎 💎 💎'); 
+//     next();
+// });
 
 app.use((req, res, next) => {
     // console.log("req.originalUrl", req.originalUrl);
@@ -81,6 +96,15 @@ app.use('/authenticate', generateToken); // If the email and password are valid 
 app.use('/health', healthRoutes);
 app.use('/users', userRoutes);
 app.use('/reminders', remindersRoutes);
+
+app.use(expressWinston.errorLogger({
+    transports: [
+        new winston.transports.Console({
+            json: true,
+            colorize: true
+        })
+    ]
+}));
 
 // error handling here after you ve called all the routes
 app.use((req, res) => {

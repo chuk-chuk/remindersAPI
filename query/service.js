@@ -12,6 +12,10 @@ module.exports.getAllReminders = (cb) => {
     collection.find().toArray(cb);
 };
 
+// module.exports.getRemindersForUser = (userId, cb) => {
+//     collection.find({}, cb);
+// };
+
 module.exports.getReminderByDate = (createdDate, cb) => {
     collection.find({ created_at: createdDate }, cb); 
 };
@@ -50,8 +54,5 @@ module.exports.updateReminder = (id, newValueText, newValueExpiry, cb) => {
 };
 
 module.exports.deleteReminderById = (id, cb) => {
-    console.log('=========', id);
-    console.log('=========', ObjectID(id));
-    
     collection.remove({ _id: ObjectID(id) }, cb);
 };
