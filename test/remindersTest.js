@@ -3,6 +3,8 @@ const chaiHttp = require('chai-http');
 const chai = require('chai');
 const moment = require('moment');
 const mongojs = require('mongojs');
+const jwt = require('jsonwebtoken');
+
 const server = require('../server');
 
 const db = mongojs('mongodb://localhost:27017/Reminders');
@@ -52,7 +54,8 @@ describe('Reminders API', () => {
         it('should post a new reminder', (done) => {
             const reminder = {
                 text: 'testing only',
-                expired_by: '2018-01-24'
+                expired_by: '2018-01-24',
+                userId: jwt.decode(token).id
             };
             chai.request(server)
                 .post('/reminders')

@@ -40,6 +40,9 @@ module.exports = (() => {
                 const token = jwt.sign(payload, config.secret, {
                     expiresIn: 86400 // expires in 24 hours 
                 });
+
+                const userId = jwt.decode(token).id;
+                console.log('DecodedUserId', userId); //5ba22897a8aa3b9a2fee1f7f
                 
                 return res.json({ token });
                 

@@ -43,12 +43,18 @@ module.exports = (() => {
     });
     
     router.post('/', (req, res, next) => {
-        service.postReminder(req.body.text, req.body.expired_by, (err, object) => {
+        console.log("REQQQQQ", req.body); 
+        // REQQQQQ { 
+        //         text: 'testing only',
+        //         expired_by: '2018-01-24',
+        //         userId: '5ba22d75e64c0a9cac4f0834' }
+        service.postReminder(req.body.text, req.body.expired_by, req.body.userId, (err, reminder) => {
             if (err) {
                 err.statusCode = 502;
                 return next(err);
             } else {
-                return res.status(200).json([object]);
+                console.log('POSTED REM', reminder);
+                return res.status(200).json([reminder]);
             }
         });
     });

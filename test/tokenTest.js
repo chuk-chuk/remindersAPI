@@ -36,6 +36,7 @@ describe('Token endpoint', () => {
                 .end((err, res) => {
                     if (err) return done(err);
                     else console.log('user authenticated');
+                    console.log("TOKEN", res.body.token);
                     expect(res.statusCode).to.equal(200);
                     expect(res.body.token).to.be.a('string');
 

@@ -24,11 +24,12 @@ module.exports.getReminderByContent = (content, cb) => {
     collection.find({ text: content }, cb);
 };
 
-module.exports.postReminder = (content, expiredDate, cb) => {
+module.exports.postReminder = (content, expiredDate, tokenUserId, cb) => {
     collection.save({
         text: content,
         created_at: moment().format('YYYY-MM-DD'),
-        expired_by: expiredDate
+        expired_by: expiredDate,
+        userId: tokenUserId
     }, cb);
 };
 
