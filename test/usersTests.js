@@ -78,6 +78,8 @@ describe('Users endpoint', () => {
                         .set('x-user-token', token)
                         .send({ email: 'updatedEmail@email.com' })
                         .end((err, res) => {
+                            console.log("777", res.body)
+                            console.log("777", err)
                             if (err) return done(err);
                             else {
                                 expect(res.statusCode).to.equal(200);

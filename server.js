@@ -4,7 +4,6 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-// const morgan = require('morgan');
 const expressWinston = require('express-winston');
 const winston = require('winston');
 
@@ -26,8 +25,6 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
 });
-
-// app.use(morgan('common'));
 
 app.use(expressWinston.logger({
     format: winston.format.json,

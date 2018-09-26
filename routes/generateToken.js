@@ -9,12 +9,12 @@ module.exports = (() => {
     const router = require('express').Router();
 
     router.post('/', (req, res, next) => {
-        console.log(req.body); // how to exclude password from outputting with req.body in server.js?
+        const logValue = Object.assign({}, req.body);
+        logValue.password = 'NOT FOR YOU';
+        console.log(logValue);
         
         // Check user against db
         userDB.getUserByEmail(req.body.email, (err, users) => {
-            console.log("ERROR", err);
-            console.log("getUserByEmail", users);
             if (!users.length) {
                 return next();
             }
@@ -41,8 +41,8 @@ module.exports = (() => {
                     expiresIn: 86400 // expires in 24 hours 
                 });
 
-                const userId = jwt.decode(token).id;
-                console.log('DecodedUserId', userId); //5ba22897a8aa3b9a2fee1f7f
+                // const userId = jwt.decode(token).id;
+                // console.log('DecodedUserId', userId); //5ba22897a8aa3b9a2fee1f7f
                 
                 return res.json({ token });
                 

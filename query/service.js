@@ -8,20 +8,17 @@ const collection = db.collection('reminders-collection');
 
 // a new collection to store user names and passwords
 
-module.exports.getAllReminders = (cb) => {
-    collection.find().toArray(cb);
+module.exports.getRemindersForUser = (id, cb) => {
+    collection.find({ userId: id }, cb); 
 };
 
-// module.exports.getRemindersForUser = (userId, cb) => {
-//     collection.find({}, cb);
-// };
-
-module.exports.getReminderByDate = (createdDate, cb) => {
-    collection.find({ created_at: createdDate }, cb); 
+module.exports.getReminderByDate = (tokenUserId, createdDate, cb) => {
+    collection.find({ userId: tokenUserId, created_at: createdDate }, cb); 
+    // collection.find({ created_at: createdDate }, cb); 
 };
 
-module.exports.getReminderByContent = (content, cb) => {
-    collection.find({ text: content }, cb);
+module.exports.getReminderByContent = (tokenUserId, content, cb) => {
+    collection.find({ userId: tokenUserId, text: content }, cb);
 };
 
 module.exports.postReminder = (content, expiredDate, tokenUserId, cb) => {
@@ -33,18 +30,21 @@ module.exports.postReminder = (content, expiredDate, tokenUserId, cb) => {
     }, cb);
 };
 
-module.exports.updateReminder = (id, newValueText, newValueExpiry, cb) => {
+module.exports.updateReminder = (tokenUserId, reminder, newValueText, newValueExpiry, cb) => {
     const update = {};
+    if (tokenUserId) {
 
-    if (typeof newValueText !== 'undefined' && newValueText) {
-        update.text = newValueText;
-    }
-    if (typeof newValueExpiry !== 'undefined' && newValueExpiry) {
-        update.expired_by = newValueExpiry;
+        if (typeof newValueText !== 'undefined' && newValueText) {
+            update.text = newValueText;
+        }
+        if (typeof newValueExpiry !== 'undefined' && newValueExpiry) {
+            update.expired_by = newValueExpiry;
+        }
+        return update;
     }
 
     collection.findAndModify({
-        query: { _id: ObjectID(id) },
+        query: { _id: ObjectID(reminder) },
         update: { 
             $set: update
         },
@@ -54,6 +54,6 @@ module.exports.updateReminder = (id, newValueText, newValueExpiry, cb) => {
     }, cb);
 };
 
-module.exports.deleteReminderById = (id, cb) => {
-    collection.remove({ _id: ObjectID(id) }, cb);
+module.exports.deleteReminderById = (tokenUserId, reminder, cb) => {
+    collection.remove({ userId: tokenUserId, _id: ObjectID(reminder) }, cb);
 };

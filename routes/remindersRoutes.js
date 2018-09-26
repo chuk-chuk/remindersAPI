@@ -5,22 +5,22 @@ module.exports = (() => {
     const router = require('express').Router();
     
     router.get('/', (req, res, next) => {
-        service.getAllReminders((err, result) => {
+        service.getRemindersForUser(req.decoded.id, (err, reminders) => {
             if (err) {
                 err.statusCode = 502;
                 return next(err);
             } else {
-                if (!result.length) {
+                if (!reminders.length) {
                     return next({ statusCode: 404 });
                 }
-                return res.json(result);
+                return res.json(reminders);
             }
         });
     });
     
     router.get('/date/:date', (req, res, next) => {
         const createdDate = req.params.date;
-        service.getReminderByDate(createdDate, (err, result) => {
+        service.getReminderByDate(req.decoded.id, createdDate, (err, result) => {
             if (err) {
                 err.status = 503;
                 return next(err);
@@ -29,10 +29,10 @@ module.exports = (() => {
             }
         });
     });
-    
+
     router.get('/content/:content', (req, res, next) => {
         const { content } = req.params;
-        service.getReminderByContent(content, (err, result) => {
+        service.getReminderByContent(req.decoded.id, content, (err, result) => {
             if (err) {
                 err.statusCode = 503;
                 return next(err);
@@ -43,24 +43,18 @@ module.exports = (() => {
     });
     
     router.post('/', (req, res, next) => {
-        console.log("REQQQQQ", req.body); 
-        // REQQQQQ { 
-        //         text: 'testing only',
-        //         expired_by: '2018-01-24',
-        //         userId: '5ba22d75e64c0a9cac4f0834' }
-        service.postReminder(req.body.text, req.body.expired_by, req.body.userId, (err, reminder) => {
+        service.postReminder(req.body.text, req.body.expired_by, req.decoded.id, (err, reminder) => {
             if (err) {
                 err.statusCode = 502;
                 return next(err);
             } else {
-                console.log('POSTED REM', reminder);
                 return res.status(200).json([reminder]);
             }
         });
     });
     
     router.put('/:reminderId', (req, res, next) => {
-        service.updateReminder(req.params.reminderId, req.body.text, req.body.expired_by, (err, object) => {
+        service.updateReminder(req.params.reminderId, req.body.text, req.body.expired_by, req.decoded.id, (err, object) => {
             if (err) {
                 err.statusCode = 502;
                 return next(err);
@@ -72,7 +66,7 @@ module.exports = (() => {
     });
     
     router.delete('/:reminderId', (req, res, next) => {
-        service.deleteReminderById(req.params.reminderId, (err, result) => {
+        service.deleteReminderById(req.params.reminderId, req.decoded.id, (err, result) => {
             if (err) {
                 err.statusCode = 502;
                 return next(err);
