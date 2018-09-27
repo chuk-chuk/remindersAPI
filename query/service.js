@@ -30,21 +30,24 @@ module.exports.postReminder = (content, expiredDate, tokenUserId, cb) => {
     }, cb);
 };
 
-module.exports.updateReminder = (tokenUserId, reminder, newValueText, newValueExpiry, cb) => {
+module.exports.updateReminder = (reminder, newValueText, newValueExpiry, tokenUserId, cb) => {
     const update = {};
-    if (tokenUserId) {
-
-        if (typeof newValueText !== 'undefined' && newValueText) {
-            update.text = newValueText;
-        }
-        if (typeof newValueExpiry !== 'undefined' && newValueExpiry) {
-            update.expired_by = newValueExpiry;
-        }
-        return update;
+    console.log('in update user');
+ 
+    if (typeof newValueText !== 'undefined' && newValueText) {
+        update.text = newValueText;
+    }
+    if (typeof newValueExpiry !== 'undefined' && newValueExpiry) {
+        update.expired_by = newValueExpiry;
     }
 
+    console.log('WE HAVE A TOKEN');
+
+    console.log('About to save', update);
+    console.log({ reminder });
+    
     collection.findAndModify({
-        query: { _id: ObjectID(reminder) },
+        query: { _id: ObjectID(reminder), userId: tokenUserId },
         update: { 
             $set: update
         },
@@ -54,6 +57,6 @@ module.exports.updateReminder = (tokenUserId, reminder, newValueText, newValueEx
     }, cb);
 };
 
-module.exports.deleteReminderById = (tokenUserId, reminder, cb) => {
+module.exports.deleteReminderById = (reminder, tokenUserId, cb) => {
     collection.remove({ userId: tokenUserId, _id: ObjectID(reminder) }, cb);
 };

@@ -19,7 +19,7 @@ const user = {
 
 let token;
 
-describe.only('Reminders API', () => {
+describe('Reminders API', () => {
     before(() => {
         db.on('connect', () => {
             console.log('database connected');
@@ -107,13 +107,12 @@ describe.only('Reminders API', () => {
             chai.request(server)
                 .get('/reminders')
                 .set('x-user-token', token)
-                .end((err, req, res) => {
-                    console.log('RES>>>>BODY', res);
-                    expect(res.statusCode).to.equal(200);
-                    expect(res.body).to.be.an('array');
+                .end((err, whatevrtyyoulikr) => {
+                    console.log('RES>>>>BODY', whatevrtyyoulikr);
+                    expect(whatevrtyyoulikr.statusCode).to.equal(200);
+                    expect(whatevrtyyoulikr.body).to.be.an('array');
                     done();
                 });
-            done();
         });
         // });
     });
@@ -130,7 +129,8 @@ describe.only('Reminders API', () => {
                         .set('x-user-token', token)
                         .send({ text: 'MONGO' })
                         .end((err, res) => {
-                            console.log("666", err)
+
+                            console.log("666", res)
                             // console.log({err, res});
                             if (err) return done(err);
                             else {
@@ -224,14 +224,14 @@ describe.only('Reminders API', () => {
                         .set('x-user-token', token)
                         .end((err, res) => {
                             console.log('reminder deleted');
-                            expect(res.statusCode).to.equal(404);
+                            expect(res.statusCode).to.equal(200);
                             done();
                         });
                 });
         });
     });
 
-    xdescribe('GET no reminders', () => {
+    describe('GET no reminders', () => {
         it('should NOT get any reminders and send 404', (done) => {
             chai.request(server)
                 .get('/reminders')

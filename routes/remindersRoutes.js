@@ -54,6 +54,10 @@ module.exports = (() => {
     });
     
     router.put('/:reminderId', (req, res, next) => {
+        console.log('params');
+        
+        console.log(req.params);
+        
         service.updateReminder(req.params.reminderId, req.body.text, req.body.expired_by, req.decoded.id, (err, object) => {
             if (err) {
                 err.statusCode = 502;
@@ -71,6 +75,7 @@ module.exports = (() => {
                 err.statusCode = 502;
                 return next(err);
             }
+            
             if (result.n < 1) {
                 return next();
             }
