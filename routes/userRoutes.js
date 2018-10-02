@@ -65,6 +65,7 @@ module.exports = (() => {
 
     router.get('/email/:email', (req, res, next) => {
         const { email } = req.params;
+        console.log("REQ>PARAMS", req.params);
         userDB.getUserByEmail(email, (err, user) => {
             if (err) {
                 err.statusCode = 503;

@@ -123,15 +123,11 @@ describe('Reminders API', () => {
                 .get('/reminders')
                 .set('x-user-token', token)
                 .end((err, res) => {
-                    console.log("777", res.body)
                     chai.request(server)
                         .put('/reminders/' + res.body[0]._id)
                         .set('x-user-token', token)
                         .send({ text: 'MONGO' })
                         .end((err, res) => {
-
-                            console.log("666", res)
-                            // console.log({err, res});
                             if (err) return done(err);
                             else {
                                 expect(res.statusCode).to.equal(200);

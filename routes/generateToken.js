@@ -25,8 +25,6 @@ module.exports = (() => {
             }
 
             comparePasswords(req.body.password, users[0].password, (err, result) => {
-                // console.log({ err });
-                // console.log({ result });
                 if (!result) {
                     const err = new Error('Nope go away');
                     return next(err);

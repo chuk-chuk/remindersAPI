@@ -21,7 +21,8 @@ module.exports.postUser = (userEmail, userPassword, cb) => {
     hashPassword(userPassword, (err, hash) => {
         collection.save({
             email: userEmail.toLowerCase(),
-            password: hash // how to exclude this password from outputting with req.body in server.js?
+            password: hash, // how to exclude this password from outputting with req.body in server.js?
+            role: 'USER'
         }, cb);
     });
     
