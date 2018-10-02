@@ -16,7 +16,7 @@ const user = {
 
 let token;
 
-describe('Users endpoint', () => {
+xdescribe('Users endpoint', () => {
     before(() => {
         db.on('connect', () => {
             console.log('database connected');
