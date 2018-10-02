@@ -14,7 +14,6 @@ module.exports.getRemindersForUser = (id, cb) => {
 
 module.exports.getReminderByDate = (tokenUserId, createdDate, cb) => {
     collection.find({ userId: tokenUserId, created_at: createdDate }, cb); 
-    // collection.find({ created_at: createdDate }, cb); 
 };
 
 module.exports.getReminderByContent = (tokenUserId, content, cb) => {
@@ -30,31 +29,33 @@ module.exports.postReminder = (content, expiredDate, tokenUserId, cb) => {
     }, cb);
 };
 
-module.exports.updateReminder = (reminder, newValueText, newValueExpiry, tokenUserId, cb) => {
+module.exports.updateReminder = (reminderId, newValueText, newValueExpiry, tokenUserId, cb) => {
     const update = {};
-    console.log('in update user');
- 
+    console.log('in update reminder');
+
     if (typeof newValueText !== 'undefined' && newValueText) {
         update.text = newValueText;
     }
     if (typeof newValueExpiry !== 'undefined' && newValueExpiry) {
         update.expired_by = newValueExpiry;
     }
-
-    console.log('WE HAVE A TOKEN');
-
-    console.log('About to save', update);
-    console.log({ reminder });
     
-    collection.findAndModify({
-        query: { _id: ObjectID(reminder), userId: tokenUserId },
-        update: { 
-            $set: update
-        },
-        upsert: false,
-        returnOriginal: false,
-        new: true,
-    }, cb);
+    console.log('WE HAVE A TOKEN');
+    console.log('About to save', update);
+    console.log({ reminderId });
+
+    // handle _id: ObjectID(reminder), userId: tokenUserId if does not exist
+    if (reminderId) {
+        collection.findAndModify({
+            query: { _id: ObjectID(reminderId), userId: tokenUserId },
+            update: { 
+                $set: update
+            },
+            upsert: false,
+            returnOriginal: false,
+            new: true,
+        }, cb);
+    }
 };
 
 module.exports.deleteReminderById = (reminder, tokenUserId, cb) => {
