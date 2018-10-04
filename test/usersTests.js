@@ -16,7 +16,7 @@ const user = {
 
 let token;
 
-xdescribe('Users endpoint', () => {
+describe('Users endpoint', () => {
     before(() => {
         db.on('connect', () => {
             console.log('database connected');
@@ -44,8 +44,8 @@ xdescribe('Users endpoint', () => {
             });
         });
     });
-
-    describe('Get users endpoint', () => {
+    // test needs to be put back when role of admin/users will be available
+    xdescribe('Get users endpoint', () => {
         it('should return 200', (done) => {
             chai.request(server)
                 .get('/users')
@@ -78,8 +78,6 @@ xdescribe('Users endpoint', () => {
                         .set('x-user-token', token)
                         .send({ email: 'updatedEmail@email.com' })
                         .end((err, res) => {
-                            console.log("777", res.body)
-                            console.log("777", err)
                             if (err) return done(err);
                             else {
                                 expect(res.statusCode).to.equal(200);
@@ -111,8 +109,8 @@ xdescribe('Users endpoint', () => {
                 });
         });
     });
-
-    describe('Get users endpoint', () => {
+    // test needs to be put back when role of admin/users will be available
+    xdescribe('Get users endpoint', () => {
         it('should return all updated users', (done) => {
             chai.request(server)
                 .get('/users')
@@ -124,8 +122,8 @@ xdescribe('Users endpoint', () => {
                 });
         });
     });
-
-    describe('Get user by email', () => {
+    // test needs to be put back when role of admin/users will be available
+    xdescribe('Get user by email', () => {
         it('should return a user by given email', (done) => {
             chai.request(server)
                 .get('/users')
