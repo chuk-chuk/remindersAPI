@@ -54,19 +54,25 @@ module.exports = (() => {
     });
     
     router.put('/:reminderId', (req, res, next) => {
-        console.log('params', req.params);
-        
         service.updateReminder(req.params.reminderId, req.body.text, req.body.expired_by, req.decoded.id, (err, reminder) => {
-            console.log({ err, reminder });
-            console.log('4444', req.decoded.id);
             if (err) {
                 err.statusCode = 502;
                 return next(err); 
             }
             if (!reminder) {
-                return res.status(403).json();
-                // check reminder.reminderId is there - service.getRem(Pem Id) ; if empty == 404, if returns, but account id !== decodedId = 403
-                //return next();
+                service.getReminderById(req.params.reminderId, (err, reminder) => {
+                    console.log('99999', reminder);
+                    if (err) {
+                        err.statusCode = 502;
+                        return next(err);
+                    } else if (reminder && req.decoded.id !== reminder.userId) {
+                        return res.status(403).json();
+                    } else if (!reminder._id) {
+                        return res.status(404).json();
+                    } else {
+                        console.log('I am not sure what\'s going on');
+                    }
+                });
             } else {
                 return res.status(200).json([reminder]);
             }

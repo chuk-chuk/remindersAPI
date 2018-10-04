@@ -147,7 +147,6 @@ describe('User journey', () => {
                 .end((err, res) => {
                     if (err) return done(err);
                     else {
-                        // 403 or 404
                         expect(res.statusCode).to.equal(403);
                         done();
                     }

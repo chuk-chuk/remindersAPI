@@ -12,6 +12,10 @@ module.exports.getRemindersForUser = (id, cb) => {
     collection.find({ userId: id }, cb); 
 };
 
+module.exports.getReminderById = (reminderId, cb) => {
+    collection.find({ _id: ObjectID(reminderId) }, cb);
+};
+
 module.exports.getReminderByDate = (tokenUserId, createdDate, cb) => {
     collection.find({ userId: tokenUserId, created_at: createdDate }, cb); 
 };
