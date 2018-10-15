@@ -54,28 +54,36 @@ module.exports = (() => {
     });
     
     router.put('/:reminderId', (req, res, next) => {
-        service.updateReminder(req.params.reminderId, req.body.text, req.body.expired_by, req.decoded.id, (err, reminder) => {
+        service.updateReminder(req.params.reminderId, req.body.text, req.body.expired_by, req.decoded.id, (err, updatedReminder) => {
             if (err) {
                 err.statusCode = 502;
                 return next(err); 
             }
-            if (!reminder) {
-                service.getReminderById(req.params.reminderId, (err, reminder) => {
-                    console.log('99999', reminder);
-                    if (err) {
-                        err.statusCode = 502;
-                        return next(err);
-                    } else if (reminder && req.decoded.id !== reminder.userId) {
-                        return res.status(403).json();
-                    } else if (!reminder._id) {
-                        return res.status(404).json();
-                    } else {
-                        console.log('I am not sure what\'s going on');
-                    }
-                });
-            } else {
-                return res.status(200).json([reminder]);
+
+            if (updatedReminder) {
+                return res.status(200).json([updatedReminder]);
             }
+
+            service.getReminderById(req.params.reminderId, (err, reminder) => {
+                if (err) {
+                    err.statusCode = 502;
+                    return next(err);
+                } 
+                
+                if (reminder && req.decoded.id !== reminder.userId) {
+                    return res.status(403).json();
+                } 
+                
+                if (!reminder._id) {
+                    return res.status(404).json();
+                } 
+
+                const error = new Error('I am not sure what\'s going on');
+                error.statusCode = 500;
+
+                return next(error);
+            });
+           
         });
     });
     
