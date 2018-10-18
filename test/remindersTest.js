@@ -1,13 +1,14 @@
+require('dotenv').config();
+
 const { expect } = require('chai');
 const chaiHttp = require('chai-http');
 const chai = require('chai');
 const moment = require('moment');
 const mongojs = require('mongojs');
-// const jwt = require('jsonwebtoken');
 
 const server = require('../server');
 
-const db = mongojs('mongodb://localhost:27017/Reminders');
+const db = mongojs(process.env.MONGO_CONNECTION_TEST);
 const collection = db.collection('reminders-collection');
 
 chai.use(chaiHttp);
@@ -107,14 +108,12 @@ describe('Reminders API', () => {
             chai.request(server)
                 .get('/reminders')
                 .set('x-user-token', token)
-                .end((err, whatevrtyyoulikr) => {
-                    console.log('RES>>>>BODY', whatevrtyyoulikr);
-                    expect(whatevrtyyoulikr.statusCode).to.equal(200);
-                    expect(whatevrtyyoulikr.body).to.be.an('array');
+                .end((err, res) => {
+                    expect(res.statusCode).to.equal(200);
+                    expect(res.body).to.be.an('array');
                     done();
                 });
         });
-        // });
     });
 
     describe('UPDATE', () => {
@@ -238,7 +237,6 @@ describe('Reminders API', () => {
                 }); 
         });
     });
-    // you expect a 404 if an authiticated user hits a non-exsistant endpoint
 });
 
         

@@ -1,10 +1,13 @@
+require('dotenv').config();
+
 const { expect } = require('chai');
 const chai = require('chai');
 const mongojs = require('mongojs');
 const chaiHttp = require('chai-http');
+
 const server = require('../server');
 
-const db = mongojs('mongodb://localhost:27017/Reminders');
+const db = mongojs(process.env.MONGO_CONNECTION_TEST);
 
 chai.use(chaiHttp);
 

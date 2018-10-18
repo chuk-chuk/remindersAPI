@@ -1,12 +1,12 @@
+require('dotenv').config();
+
 const moment = require('moment');
 const mongojs = require('mongojs');
 
-const db = mongojs('mongodb://localhost:27017/Reminders');
+const db = mongojs(process.env.MONGO_CONNECTION_TEST);
 const { ObjectID } = require('mongodb');
 
 const collection = db.collection('reminders-collection');
-
-// a new collection to store user names and passwords
 
 module.exports.getRemindersForUser = (id, cb) => {
     collection.find({ userId: id }, cb); 
@@ -43,10 +43,6 @@ module.exports.updateReminder = (reminderId, newValueText, newValueExpiry, token
     if (typeof newValueExpiry !== 'undefined' && newValueExpiry) {
         update.expired_by = newValueExpiry;
     }
-    
-    console.log('WE HAVE A TOKEN');
-    console.log('About to save', update);
-    console.log({ reminderId });
 
     // handle _id: ObjectID(reminder), userId: tokenUserId if does not exist
     if (reminderId) {
