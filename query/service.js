@@ -1,11 +1,13 @@
-require('dotenv').config();
-
-const moment = require('moment');
+const config = require('config');
 const mongojs = require('mongojs');
 
-const db = mongojs(process.env.MONGO_CONNECTION_TEST);
+const moment = require('moment');
+
+const { host, port, dbName } = config.get('Connection.dbConfig');
+const db = mongojs(`mongodb://${host}:${port}/${dbName}`);
 const { ObjectID } = require('mongodb');
 
+console.log({ dbName });
 const collection = db.collection('reminders-collection');
 
 module.exports.getRemindersForUser = (id, cb) => {

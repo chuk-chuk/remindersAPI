@@ -1,0 +1,12 @@
+{
+    "Connection": {
+      "app": {
+        "port": 8080
+      },
+      "dbConfig": {
+        "host": "localhost",
+        "port": 27017,
+        "dbName": "reminders-test"
+      }
+    }
+  }

@@ -1,0 +1,7 @@
+{
+    "Connection": {
+      "dbConfig": {
+        "dbName": "reminders-test"
+      }
+    }
+  }

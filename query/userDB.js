@@ -1,14 +1,14 @@
-require('dotenv').config();
-
+const config = require('config');
 const mongojs = require('mongojs');
 
+const { host, port, dbName } = config.get('Connection.dbConfig');
+const db = mongojs(`mongodb://${host}:${port}/${dbName}`);
 const { ObjectID } = require('mongodb');
 
-const { hashPassword } = require('../helpers/hash');
-
-const db = mongojs(process.env.MONGO_CONNECTION_TEST);
-
+console.log({ dbName });
 const collection = db.collection('users-collection');
+
+const { hashPassword } = require('../helpers/hash');
 
 module.exports.getAllUsers = (cb) => {
     collection.find().toArray(cb);

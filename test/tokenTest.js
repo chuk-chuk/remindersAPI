@@ -1,13 +1,15 @@
-require('dotenv').config();
+const config = require('config');
 
-const { expect } = require('chai');
-const chai = require('chai');
 const mongojs = require('mongojs');
+
+const chai = require('chai');
 const chaiHttp = require('chai-http');
+const { expect } = require('chai');
 
 const server = require('../server');
 
-const db = mongojs(process.env.MONGO_CONNECTION_TEST);
+const { host, port, dbName } = config.get('Connection.dbConfig');
+const db = mongojs(`mongodb://${host}:${port}/${dbName}`);
 
 chai.use(chaiHttp);
 
