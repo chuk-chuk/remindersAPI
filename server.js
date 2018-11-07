@@ -12,7 +12,7 @@ const port = process.env.PORT || 8080;
 const remindersRoutes = require('./routes/remindersRoutes');
 const userRoutes = require('./routes/userRoutes');
 const healthRoutes = require('./routes/healthRoutes');
-const generateToken = require('./routes/generateToken');
+const authenticateUser = require('./routes/authenticateUser');
 
 const config = require('./helpers/config');
 
@@ -89,7 +89,7 @@ app.listen(port, () => {
     console.log('Listening on port ' + port);
 });
 
-app.use('/authenticate', generateToken); // If the email and password are valid - create a token and pass that back
+app.use('/authenticate', authenticateUser); // If the email and password are valid - create a token and pass that back
 app.use('/health', healthRoutes);
 app.use('/users', userRoutes);
 app.use('/reminders', remindersRoutes);

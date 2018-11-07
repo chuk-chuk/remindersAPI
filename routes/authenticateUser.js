@@ -3,31 +3,30 @@ const userDB = require('../query/userDB');
 const config = require('../helpers/config');
 const { comparePasswords } = require('../helpers/hash');
 
-
 module.exports = (() => {
     /* eslint-disable global-require */
     const router = require('express').Router();
 
-    router.post('/', (req, res, next) => {
+    // login an existing user with email and password
+    router.post('/', (req, res) => {
         const logValue = Object.assign({}, req.body);
         logValue.password = 'NOT FOR YOU';
         console.log(logValue);
-        
-        // Check user against db
+
         userDB.getUserByEmail(req.body.email, (err, users) => {
             if (!users.length) {
-                return next();
-            }
-
-            if (users[0].email !== req.body.email) {
-                const err = new Error('Nope go away');
-                return next(err);
+                return res.status(401).send({ 
+                    auth: false, 
+                    message: 'User could not be authenticated.' 
+                });
             }
 
             comparePasswords(req.body.password, users[0].password, (err, result) => {
                 if (!result) {
-                    const err = new Error('Nope go away');
-                    return next(err);
+                    return res.status(401).send({ 
+                        auth: false, 
+                        message: 'User could not be authenticated.' 
+                    });
                 }
                 
                 const payload = {
@@ -38,9 +37,6 @@ module.exports = (() => {
                 const token = jwt.sign(payload, config.secret, {
                     expiresIn: 86400 // expires in 24 hours 
                 });
-
-                // const userId = jwt.decode(token).id;
-                // console.log('DecodedUserId', userId); //5ba22897a8aa3b9a2fee1f7f
                 
                 return res.json({ token });
                 

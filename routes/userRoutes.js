@@ -1,4 +1,6 @@
+const jwt = require('jsonwebtoken');
 const userDB = require('../query/userDB');
+const config = require('../helpers/config');
 
 const MIN_PASSWORD_LENGTH = 5;
 const MAX_PASSWORD_LENGTH = 10;
@@ -26,24 +28,33 @@ module.exports = (() => {
         });
     });
 
+    // signup  a new user with email and password
     router.post('/', (req, res, next) => {
         if (!req.body) { return res.sendStatus(400); }
         
-        if (!req.body.email || !req.body.password) {
-            return res.status(400).send('Missing email or password');
+        if (!req.body.email) {
+            return res.status(400).send('Missing email - please provide!');
+        }
+        
+        // if (!req.body.email.match( /^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/)) {
+        //     return res.status(400).send('Please enter a valid email address');
+        // }
+
+        if (!req.body.password) {
+            return res.status(400).send('Missing password - please provide!');
         }
         
         if (req.body.password.length < MIN_PASSWORD_LENGTH
             || req.body.password.length > MAX_PASSWORD_LENGTH) {
             return res.status(400).send(
                 'Password must be between ' + MIN_PASSWORD_LENGTH + ' and '
-                    + MAX_PASSWORD_LENGTH + ' characters long'
+                    + MAX_PASSWORD_LENGTH + ' characters long.'
             );
         }
             
         userDB.getUserByEmail(req.body.email, (err, users) => {
             if (err) return next(err);
-        
+
             if (users.length > 0) {
                 return res.status(409).send('A user with the specified email already exists');
             }
@@ -53,11 +64,21 @@ module.exports = (() => {
                     err.statusCode = 502;
                     return next(err);
                 } else {
-                    const modifiedUser = { 
+                    // const modifiedUser = { 
+                    //     email: user.email
+                    // };
+                    // console.log(modifiedUser);
+                    // return res.status(200).json([modifiedUser]);
+                    const payload = {
+                        // id: user._id,
                         email: user.email
                     };
-                    console.log(modifiedUser);
-                    return res.status(200).json([modifiedUser]);
+                    
+                    const token = jwt.sign(payload, config.secret, {
+                        expiresIn: 86400 // expires in 24 hours 
+                    });
+
+                    return res.json({ token });
                 }
             });
         });  
@@ -65,7 +86,6 @@ module.exports = (() => {
 
     router.get('/email/:email', (req, res, next) => {
         const { email } = req.params;
-        console.log("REQ>PARAMS", req.params);
         userDB.getUserByEmail(email, (err, user) => {
             if (err) {
                 err.statusCode = 503;
